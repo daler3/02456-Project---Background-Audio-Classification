@@ -25,19 +25,34 @@ class preprocessor(object):
         :return:
 
         length of raw sound is 4s or 88200 with sample_rate = 22050Hz
-        default segment_size = 512 * (frames - 1) = 512 * 40 = 20480 (why?)
+        We have 22050 samples per second, hence 88200 values
+
+        Short variant: default segment_size = hop-length * (frames - 1) = 512 * (41 - 1) = 20480 (why?)
         20480 is ~980ms with sample_rate = 22050Hz
 
         If 0.5 overlap, segments start at 0, 10240, 20480, etc.
         88200 / 10240 = 8,61 = 9 segments of length 20480
+
+        Long variant: default segment_size = 512 * (101 - 1) = 51200
+        If 0.9 overlap, segments are:
+        0 -> 51200,
+        (0.1 * 51200) -> 51200 + 0.1 * 51200
+        (0.2 * 51200) -> 51200 + 0.2 * 51200
+        ...
+        51200 + 5120 + 5120 + ... Still 9 segments of length 51200
+
+        We conclude that he segments the clips because of the limited amount of training examples.
+        Segmenting helps preventing overfitting
         """
 
         sound_raw, sample_rate = librosa.load(file_name)
 
         # TODO Normalize sound
-        # Accrding to its own max?
+        # According to its own max?
         #normalization_factor = 1 / np.max(np.abs(sound_raw))
         #sound_raw = sound_raw * normalization_factor
+
+        # TODO discard silent segments
 
         X = []
         labels = []
