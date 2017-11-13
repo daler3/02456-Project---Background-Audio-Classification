@@ -5,17 +5,27 @@ import librosa
 
 
 class preprocessor(object):
-
+    """
+    Preprocessor loads the audio samples, splits them in segments (observations) and saves them along with the
+    label in X and y.
+    Then, it splits the data in training and test data, saving it in train_x, train_y, test_x and test_y.
+    """
     def __init__(self, parent_dir='data/UrbanSound8K/audio'):
         np.random.seed(23)
         self.parent_dir = parent_dir
+        self.train_dirs = ''
+        #self.test_dir = ''
+
         self.X = []
         self.y = []
-        self.train = ([],[])
-        self.test = ([],[])
         self.labels = ([])
 
-    def split_sound_into_segments(self, file_name, segment_size=20480):
+        self.train_x = []
+        self.train_y = []
+        self.test_x = []
+        self.test_y = []
+
+    def split_sound_into_segments(self, file_name, segment_size, overlap):
         """
         Split raw .wav file in librosa segments of segment_size.
         First the method sample_splitter is called to retrieve (start, end) times of the segments.
@@ -30,7 +40,7 @@ class preprocessor(object):
         Short variant: default segment_size = hop-length * (frames - 1) = 512 * (41 - 1) = 20480 (why?)
         20480 is ~980ms with sample_rate = 22050Hz
 
-        If 0.5 overlap, segments start at 0, 10240, 20480, etc.
+        If 0.5 overlap, segments start at 0, 10240, 20480, ... , 61440, 71680
         88200 / 10240 = 8,61 = 9 segments of length 20480
 
         Long variant: default segment_size = 512 * (101 - 1) = 51200
@@ -47,38 +57,47 @@ class preprocessor(object):
 
         sound_raw, sample_rate = librosa.load(file_name)
 
-        # TODO Normalize sound
-        # According to its own max?
-        #normalization_factor = 1 / np.max(np.abs(sound_raw))
-        #sound_raw = sound_raw * normalization_factor
+        # normalization
+        normalization_factor = 1 / np.max(np.abs(sound_raw))
+        sound_raw = sound_raw * normalization_factor
 
-        # TODO discard silent segments
-
-        X = []
-        labels = []
-
-        def sample_splitter(data, overlap=0.5):
+        def sample_splitter(data):
             """
             This method returns start and end time of the shorter segments produced from the raw sound.
             :param data: raw sound
-            :param overlap: overlap between one segment and the other
             :return: (start, end) couples for the new segments
             """
             start = 0.0
-            while (start + segment_size) < len(data):
-                yield int(start), int(start + segment_size)
-                # 50% overlap
-                start += float(segment_size * overlap)
+            end = start + segment_size
 
-        # label is the first part of the filename, i.e. 7383 for dog bark
-        label = file_name.split('/')[-1].split('-')[0]
+            while (start <= len(data)):
+                # if last segment
+                if (end > len(data)):
+                    yield int(len(data) - segment_size), int(len(data))
+                    break
 
-        for (start, end) in sample_splitter(sound_raw):
-            signal = sound_raw[start:end]
-            X.append(signal)
+                yield int(start), int(end)
+                start += float(segment_size * (1 - overlap))
+                end += float(segment_size * (1 - overlap))
+
+        observations = []
+        labels = []
+
+        # label is the second part of the filename, i.e. 3 for dog bark
+        label = file_name.split('/')[-1].split('-')[1]
+
+        if(len(sound_raw) < segment_size): # one single segment
+            sound_raw = np.pad(sound_raw, (0, segment_size - len(sound_raw)), 'constant')
+            observations.append(sound_raw)
             labels = np.append(labels, label)
+        else:
+            for (start, end) in sample_splitter(sound_raw):
+                segment = sound_raw[start:end]
+                # TODO discard silent segments
+                observations.append(segment)
+                labels = np.append(labels, label)
 
-        return X, labels
+        return observations, labels
 
     def extract_features_cnn(self, sound_raw, segment_size, bands, frames):
         """
@@ -93,13 +112,14 @@ class preprocessor(object):
 
         # Since we want 41 frames (might end with 42)
         hop_length = (segment_size / frames)
-        hop_length = int(hop_length + 1)  # dummy + 1 for always rounding up TODO why?
+        hop_length = int(hop_length + 1)  # rounding up
 
-        melspec = librosa.feature.melspectrogram(sound_raw, n_mels=bands, hop_length=hop_length)
+        melspec = librosa.feature.melspectrogram(y=sound_raw, n_mels=bands, hop_length=hop_length)
         logspec = librosa.logamplitude(melspec)
-        delta = librosa.feature.delta(logspec)
-
-        features = np.concatenate((logspec.reshape(bands, frames, 1), delta.reshape(bands, frames, 1)), axis=2)
+        # TODO reinclude delta?
+        #delta = librosa.feature.delta(logspec)
+        #features = np.concatenate((logspec.reshape(bands, frames, 1), delta.reshape(bands, frames, 1)), axis=2)
+        features = logspec.reshape(bands, frames, 1)
 
         return features
 
@@ -110,7 +130,8 @@ class preprocessor(object):
         :return: one-hot-vector matrix for the labels
         """
         n_labels = len(labels)
-        n_unique_labels = len(np.unique(labels))
+        #n_unique_labels = len(np.unique(labels))
+        n_unique_labels = 10
         one_hot_encode = np.zeros((n_labels, n_unique_labels))
         one_hot_encode[np.arange(n_labels), labels] = 1
 
@@ -122,7 +143,7 @@ class preprocessor(object):
         :param test_split:
         :return:
         """
-        print ("Creating data split split...")
+        # TODO implement cross-validation instead
         n_samples = len(self.X)
 
         # Create a permutation
@@ -135,48 +156,41 @@ class preprocessor(object):
         train_x = np.array([self.X[s] for s in random_perm[:n_train]])
         train_y = np.array([self.y[s] for s in random_perm[:n_train]])
 
-        print ("Length of trainX: {0}".format(len(train_x)))
-        print ("Length of trainY: {0}".format(len(train_y)))
-        print ("Length of TestX: {0}".format(len(test_y)))
-        print ("Length of TestY: {0}".format(len(test_y)))
+        return train_x, train_y, test_x, test_y
 
-        train = (train_x, train_y)
-        test = (test_x, test_y)
-
-        return train, test
-
-    def data_prep(self, sub_dirs, segment_size=2048, bands=60, frames=41, file_ext="*.wav"):
+    def data_prep(self, train_dirs, segment_size=20480, overlap=0.5, bands=60, frames=41, file_ext="*.wav"):
         """
         Data prep loads all the sound files in sub_dirs, then it splits them into segments of segment_size,
         then it extracts features and labels. Finally, it splits the data in train and test and assigns these to variables.
-        :param sub_dirs:
-        :param frames:
-        :param segment_size:
-        :param bands:
-        :param file_ext:
-        :return:
         """
+
+        self.train_dirs = train_dirs
 
         X_total, labels_total = [], []
 
-        for sub_dir in sub_dirs:
+        for sub_dir in self.train_dirs:
             for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, file_ext)):
                 try:
-                    X, labels = self.split_sound_into_segments(fn, segment_size)
-                    [X_total.append(self.extract_features_cnn(sample, segment_size, bands, frames)) for sample in X]
+                    # data
+                    segments, labels = self.split_sound_into_segments(fn, segment_size, overlap)
+                    # features
+                    [X_total.append(self.extract_features_cnn(sample, segment_size, bands, frames)) for sample in segments]
+                    # labels
                     [labels_total.append(label) for label in labels]
                 except Exception as e:
-                    print ("Error encountered while parsing file: ", fn)
+                    print ("Error encountered while parsing file: ", fn, e)
                     continue
 
         self.labels = labels_total
         self.y = self.one_hot_encode(np.array(labels_total, dtype=np.int))
         self.X = np.array(X_total)
-        self.train, self.test = self.get_train_test_split()
+        self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
+        # TODO save extracted features on .csv
 
 if __name__ == '__main__':
     # Testing the data_preprocessor
     pp = preprocessor()
 
-    pp.data_prep(sub_dirs=["fold1"])
+    pp.data_prep(train_dirs=["fold0"])
+    #pp.data_prep(train_dirs=["fold0"], segment_size=51200, overlap=0.9, frames=101)
     print("Breakpoint here!")
