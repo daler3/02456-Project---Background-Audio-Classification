@@ -1,6 +1,6 @@
-import numpy as np
-import glob
 import os
+import glob
+import numpy as np
 import librosa
 
 

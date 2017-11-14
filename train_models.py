@@ -1,16 +1,23 @@
 from preprocessor import preprocessor
 from keras_models import piczak_CNN
 from keras.callbacks import TensorBoard
+from sklearn import metrics
 import numpy as np
 import pandas as pd
+import utils
 
+classes = ['air_conditioner', 'car_horn', 'children_playing', 'dog_bark', 'drilling', 'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music']
+train_dirs = []
+
+for i in range(1,11):
+    train_dirs.append('fold{0}'.format(i))
 
 def train_keras_cnn(epochs=100, output_model_file="./piczak_model.h5",
                     output_predictions_file="./test.csv"):
 
-    pp = preprocessor(parent_dir='data/UrbanSound8K/audio')
+    pp = preprocessor(parent_dir='E:/Deep Learning Datasets/UrbanSound8K/audio')
     print("Loading the data...")
-    pp.data_prep(train_dirs=['fold1'])
+    pp.data_prep(train_dirs=train_dirs)
 
     tb = TensorBoard(log_dir='./TensorBoard')
 
@@ -35,6 +42,8 @@ def train_keras_cnn(epochs=100, output_model_file="./piczak_model.h5",
 
     preds = model.predict_classes(pp.test_x, verbose=0)
     write_preds(preds, output_predictions_file)
+    confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
+    utils.plot_confusion_matrix(confusion_matrix, classes)
 
 
 if __name__ == '__main__':
