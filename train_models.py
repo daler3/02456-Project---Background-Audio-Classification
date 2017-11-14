@@ -17,6 +17,8 @@ def train_keras_cnn(epochs=100, output_model_file="./piczak_model.h5",
 
     pp = preprocessor(parent_dir='E:/Deep Learning Datasets/UrbanSound8K/audio')
     print("Loading the data...")
+    # Run this to load the extracted features
+    # pp.data_prep(train_dirs=["fold1", "fold2", "fold3", "fold4", "fold5", "fold6", "fold7", "fold8", "fold9", "fold10"], load_path='extracted')
     pp.data_prep(train_dirs=train_dirs)
 
     tb = TensorBoard(log_dir='./TensorBoard')
