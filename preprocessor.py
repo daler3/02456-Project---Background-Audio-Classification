@@ -14,7 +14,6 @@ class preprocessor(object):
         np.random.seed(23)
         self.parent_dir = parent_dir
         self.train_dirs = ''
-        #self.test_dir = ''
 
         self.X = []
         self.y = []
@@ -117,10 +116,10 @@ class preprocessor(object):
 
         melspec = librosa.feature.melspectrogram(y=sound_raw, n_mels=bands, hop_length=hop_length)
         logspec = librosa.logamplitude(melspec)
-        # TODO reinclude delta?
-        # delta = librosa.feature.delta(logspec)
-        # features = np.concatenate((logspec.reshape(bands, frames, 1), delta.reshape(bands, frames, 1)), axis=2)
-        features = logspec.reshape(bands, frames, 1)
+
+        delta = librosa.feature.delta(logspec)
+        features = np.concatenate((logspec.reshape(bands, frames, 1), delta.reshape(bands, frames, 1)), axis=2)
+        #features = logspec.reshape(bands, frames, 1)
 
         return features
 
@@ -160,17 +159,23 @@ class preprocessor(object):
         return train_x, train_y, test_x, test_y
 
     def data_prep(self, train_dirs, segment_size=20480, overlap=0.5, bands=60, frames=41, file_ext="*.wav",
-                  save_extracted=False, extracted_path=''):
+                  save_path='', load_path=''):
         """
-        Data prep loads all the sound files in sub_dirs, then it splits them into segments of segment_size,
+        Data prep loads all the sound files in train_dirs, then it splits them into segments of segment_size,
         then it extracts features and labels. Finally, it splits the data in train and test and assigns these to variables.
         """
 
         self.train_dirs = train_dirs
 
-        if extracted_path:
-            self.X = np.load(extracted_path + '/features.npy')
-            self.y = np.load(extracted_path + '/labels.npy')
+        if load_path:
+            for dir in train_dirs:
+                fts = np.load(load_path + '/' + dir + '/features.npy')
+                lbs = np.load(load_path + '/' + dir + '/labels.npy')
+                if len(self.X) == 0:
+                    self.X, self.y = fts, lbs
+                else:
+                    self.X = np.concatenate((self.X, fts), axis=0)
+                    self.y = np.concatenate((self.y, lbs), axis=0)
         else:
             X_total, labels_total = [], []
 
@@ -186,14 +191,14 @@ class preprocessor(object):
                     except Exception as e:
                         print ("Error encountered while parsing file: ", fn, e)
                         continue
+                if save_path:
+                    np.save(save_path + '/' + sub_dir + '/features', np.array(X_total))
+                    np.save(save_path + '/' + sub_dir + '/labels', self.one_hot_encode(np.array(labels_total, dtype=np.int)))
+                    X_total, labels_total = [], []
 
             self.labels = labels_total
             self.y = self.one_hot_encode(np.array(labels_total, dtype=np.int))
             self.X = np.array(X_total)
-
-            if save_extracted:
-                np.save("extracted/features", self.X)
-                np.save("extracted/labels", self.y)
 
         self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
 
@@ -202,6 +207,8 @@ if __name__ == '__main__':
     # Testing the data_preprocessor
     pp = preprocessor()
 
-    pp.data_prep(train_dirs=["fold0"], extracted_path='extracted')
-    # pp.data_prep(train_dirs=["fold0"], segment_size=51200, overlap=0.9, frames=101)
+    # Run this to extract features and save them
+    # (First you have to create the folders)
+    # pp.data_prep(train_dirs=["fold1", "fold2", "fold3", "fold4", "fold5", "fold6", "fold7", "fold8", "fold9", "fold10"], save_path='extracted')
+
     print("Breakpoint here!")
