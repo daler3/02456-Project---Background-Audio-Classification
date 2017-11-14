@@ -117,9 +117,9 @@ class preprocessor(object):
         melspec = librosa.feature.melspectrogram(y=sound_raw, n_mels=bands, hop_length=hop_length)
         logspec = librosa.logamplitude(melspec)
         # TODO reinclude delta?
-        #delta = librosa.feature.delta(logspec)
-        #features = np.concatenate((logspec.reshape(bands, frames, 1), delta.reshape(bands, frames, 1)), axis=2)
-        features = logspec.reshape(bands, frames, 1)
+        delta = librosa.feature.delta(logspec)
+        features = np.concatenate((logspec.reshape(bands, frames, 1), delta.reshape(bands, frames, 1)), axis=2)
+        #features = logspec.reshape(bands, frames, 1)
 
         return features
 
