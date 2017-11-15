@@ -99,3 +99,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+TensorBoard/
+*.h5
+.vscode/
