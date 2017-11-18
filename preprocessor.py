@@ -157,7 +157,7 @@ class preprocessor(object):
 
         return train_x, train_y, test_x, test_y
 
-    def data_prep(self, train_dirs, segment_size=20480, overlap=0.5, bands=60, frames=41, file_ext="*.wav",
+    def data_prep(self, train_dirs, segment_size=51200, overlap=0.9, bands=60, frames=101, file_ext="*.wav",
                   save_path='', load_path=''):
         """
         Data prep loads all the sound files in train_dirs, then it splits them into segments of segment_size,
@@ -191,8 +191,11 @@ class preprocessor(object):
                         print ("Error encountered while parsing file: ", fn, e)
                         continue
                 if save_path:
-                    np.save(save_path + '/' + sub_dir + '/features', np.array(X_total))
-                    np.save(save_path + '/' + sub_dir + '/labels', self.one_hot_encode(np.array(labels_total, dtype=np.int)))
+                    directory = save_path + '\\' + sub_dir
+                    if not os.path.exists(directory):
+                        os.makedirs(directory)
+                    np.save(directory + '\\features', np.array(X_total))
+                    np.save(directory + '\\labels', self.one_hot_encode(np.array(labels_total, dtype=np.int)))
                     X_total, labels_total = [], []
 
             self.labels = labels_total

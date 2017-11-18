@@ -8,18 +8,18 @@ import utils
 
 classes = ['air_conditioner', 'car_horn', 'children_playing', 'dog_bark', 'drilling', 'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music']
 train_dirs = []
-
-for i in range(1,11):
+save_dir = 'C:\\Deep Learning Dataset\\UrbanSound8K\\extracted_long'
+for i in range(2,11):
     train_dirs.append('fold{0}'.format(i))
 
-def train_keras_cnn(epochs=100, output_model_file="./piczak_model.h5",
+def train_keras_cnn(epochs=100, output_model_file="./piczak_model_fold1_only.h5",
                     output_predictions_file="./test.csv"):
 
-    pp = preprocessor(parent_dir='E:/Deep Learning Datasets/UrbanSound8K/audio')
+    pp = preprocessor(parent_dir='C:\\Deep Learning Dataset\\UrbanSound8K\\audio')
     print("Loading the data...")
     # Run this to load the extracted features
     # pp.data_prep(train_dirs=["fold1", "fold2", "fold3", "fold4", "fold5", "fold6", "fold7", "fold8", "fold9", "fold10"], load_path='extracted')
-    pp.data_prep(train_dirs=train_dirs)
+    pp.data_prep(train_dirs=train_dirs, load_path=save_dir)
 
     tb = TensorBoard(log_dir='./TensorBoard')
 
