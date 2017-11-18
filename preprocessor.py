@@ -29,9 +29,6 @@ class preprocessor(object):
         Split raw .wav file in librosa segments of segment_size.
         First the method sample_splitter is called to retrieve (start, end) times of the segments.
         Then, the signals are retrieved and collected in the X array along with the labels in another array.
-        :param file_name:
-        :param segment_size:
-        :return:
 
         length of raw sound is 4s or 88200 with sample_rate = 22050Hz
         We have 22050 samples per second, hence 88200 values
@@ -103,11 +100,6 @@ class preprocessor(object):
         """
         This method extract features relevant for classification from a librosa representation.
         Bands and frames are the dimensions of the convolution filters applied on the spectrogram.
-        :param sound_raw:
-        :param segment_size:
-        :param bands:
-        :param frames:
-        :return:
         """
 
         # Since we want 41 frames (might end with 42)
@@ -142,7 +134,6 @@ class preprocessor(object):
         :param test_split:
         :return:
         """
-        # TODO implement cross-validation instead
         n_samples = len(self.X)
 
         # Create a permutation
@@ -157,7 +148,7 @@ class preprocessor(object):
 
         return train_x, train_y, test_x, test_y
 
-    def data_prep(self, train_dirs, segment_size=51200, overlap=0.9, bands=60, frames=101, file_ext="*.wav",
+    def data_prep(self, train_dirs, test_fold='', segment_size=20480, overlap=0.5, bands=60, frames=41, file_ext="*.wav",
                   save_path='', load_path=''):
         """
         Data prep loads all the sound files in train_dirs, then it splits them into segments of segment_size,
@@ -202,7 +193,12 @@ class preprocessor(object):
             self.y = self.one_hot_encode(np.array(labels_total, dtype=np.int))
             self.X = np.array(X_total)
 
-        self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
+        if test_fold:
+            self.train_x, self.train_y = self.X, self.y
+            self.test_x = np.load(load_path + '/' + test_fold + '/features.npy')
+            self.test_y = np.load(load_path + '/' + test_fold + '/labels.npy')
+        else:
+            self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
 
 
 if __name__ == '__main__':
