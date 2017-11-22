@@ -102,3 +102,4 @@ ENV/
 TensorBoard/
 *.h5
 .vscode/
+.idea/
