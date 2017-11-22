@@ -1,3 +1,4 @@
+###for aud in *.wav; do ffmpeg -i "$aud" -ar 44100 "data_enc/${aud%.mp3}-enc.wav"; done
 import pandas
 import sys
 import wave
@@ -12,6 +13,7 @@ from pydub import generators as g
 import scipy.io
 from scipy.io import wavfile
 import soundfile as sf
+import wavio
 
 
 #def white_noise(amplitude=0.5):
@@ -32,26 +34,32 @@ def retrieve_audio_from_df(or_path, element_df):
     if len(rs) > 1: ##then wn
         name = rs[0]
         path = or_path + "/" + name
-        print (path)
-        #sound = AudioSegment.from_file(path)
+        #print (path)
+        sound = AudioSegment.from_file(path)
         #r, sound = wavfile.read(path)
-        sound = sf.read(path)
-        temp_name = or_path + "/" + "temp.wav"
+        ##sound = sf.read(path)
+        #print (wavfile.read(path))
+        #print (path)
+        #print (sound[0].dtype)
+        ##temp_name = or_path + "/" + "temp.wav"
         #wavfile.write(temp_name, 44100, sound)
-        sf.write(temp_name, sound, 44100)
-        sound = AudioSegment.from_file(temp_name)
+        ##sf.write(temp_name, sound, 44100)
+        ##sound = AudioSegment.from_file(temp_name)
         sound_with_wn = add_white_noise(sound)
         sound = sound_with_wn
     else: 
         path = or_path + "/" + rs[0]
-        print (path)
-        #sound = AudioSegment.from_file(path)
-        #r, sound = wavfile.read(path)
-        sound = sf.read(path)
-        temp_name = or_path + "/" + "temp.wav"
-        #wavfile.write(temp_name, 44100, sound)
-        sf.write(temp_name, sound, 44100)
-        sound = AudioSegment.from_file(temp_name)
+        #print (path)
+        sound = AudioSegment.from_file(path)
+        ##r, sound = wavfile.read(path)
+        ##sound = sf.read(path)
+        #print (wavfile.read(path))
+        #print (path)
+        #print (sound[0].dtype)
+        ##temp_name = or_path + "/" + "temp.wav"
+        ##wavfile.write(temp_name, 44100, sound)
+        #sf.write(temp_name, sound, 44100)
+        ##sound = AudioSegment.from_file(temp_name)
 
     return sound
 
@@ -150,18 +158,26 @@ for l in new_lists:
 copy_new_lists = new_lists.copy()
 destination_path = "data/UrbanSound8K/audio_overlap/folder1_overlap"
 original_path = "data/UrbanSound8K/audio/fold1"
-new_csv_list = pandas.DataFrame()
+#new_csv_list = pandas.DataFrame()
 
 
-
+maxim = 9
 folder_number = "1"
-for l in new_lists: ###list of the lists
+range_ind = 99
+#for l in new_lists:
+	#print (len(l.index))
+for i in range(0, len(new_lists)-1): ###list of the lists
+	l = copy_new_lists[0]
+	#print (len(copy_new_lists))
 	copy_new_lists.remove(l) #remove that list
 	index = 0
+	#print (len(l.index))
+	#print (l)
 	#print ("ciaociaociao_before")
-	for counter_ind in range(0, 99): ##for each element in the first class
+	for counter_ind in range(0, range_ind): ##for each element in the first class
 		el = l.iloc[[counter_ind]]
-		if index == 9: 
+		#print (el)
+		if index == maxim: 
 			index = 0
 		#retrieve name and row df
 		#from path load
@@ -169,14 +185,30 @@ for l in new_lists: ###list of the lists
  		#print (type(el))
 		sound1 = retrieve_audio_from_df(original_path, el) ##retrieve original sound
 		sound2 = retrieve_audio_from_df(original_path, copy_new_lists[index].iloc[[0]]) #retrieve second sound
+		#print (el)
+		#print (copy_new_lists[index].iloc[[0]])
 		###combine the two sounds and save the results
 		res_element_row, el_name = combine_elements_names(el, copy_new_lists[index].iloc[[0]], folder_number) #name of the combined sound
 		#print (res_element_row)
 		combine_sounds(sound1, sound2, destination_path, el_name)
-		new_csv_list.append(res_element_row) ##append the element to the pandas df, to be written  
+		if (i==0 and counter_ind == 0):
+			new_csv_list = res_element_row
+			#print (len(new_csv_list.index))
+		else:
+			new_csv_list = new_csv_list.append(res_element_row, ignore_index=True) ##append the element to the pandas df, to be written
+			#print (len(new_csv_list.index))
+		#print (new_csv_list)
 		#print (copy_new_lists[index].iloc[[0]])
-		copy_new_lists[index].drop(0, axis=0, inplace=True) ##remove that element
+		#print (copy_new_lists[index].iloc[[0]])
+		#print (len(copy_new_lists[index].index))
+		copy_new_lists[index].drop(0, axis=0, inplace=True)
+		#print (len(copy_new_lists[index].index))
+		copy_new_lists[index].reset_index(drop=True, inplace=True) ##remove that element
+		#print (len(copy_new_lists[index].index))
+		#copy_new_lists[index] = copy_new_lists[index][copy_new_lists.slice_file_name != ]
 		index += 1 ## increase  
+	maxim = maxim - 1
+	range_ind = range_ind - 11
 
 ##save the new cs to a file 
 new_csv_list.to_csv("data/UrbanSound8K/audio_overlap/folder_1_names.csv")
