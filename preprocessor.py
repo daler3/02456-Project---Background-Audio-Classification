@@ -124,6 +124,7 @@ class preprocessor(object):
 
 		hot_encode = np.zeros((n_labels,n_unique_labels))
 		for i,lab in enumerate(labels):
+			## Assuming + as seperator between labels in audio file name
 			for j in lab.split('+'):
 				hot_encode[i][int(j)] = 1
 		return hot_encode
@@ -206,6 +207,7 @@ class preprocessor(object):
 					X_total, labels_total = [], []
 
 			self.labels = labels_total
+			# Using the plus_one_hot encode instead (note that we do not pass a np.array but just the list of labels.)
 			self.y = self.plus_one_hot_encode(labels_total)
 			#self.y = self.one_hot_encode(np.array(labels_total, dtype=np.int))
 			self.X = np.array(X_total)

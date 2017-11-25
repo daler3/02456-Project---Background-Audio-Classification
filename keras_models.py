@@ -55,6 +55,7 @@ def piczak_CNN(input_dim, output_dim,
 
 	# layer
 	model.add(Dense(output_dim))
+	# Removed the softmax output layer as a sigmoid transformation of the output is done by our custom loss function.
 	#model.add(Activation('softmax'))
 	inp = model.input  # input placeholder
 	outputs = [layer.output for layer in model.layers]  # all layer outputs
