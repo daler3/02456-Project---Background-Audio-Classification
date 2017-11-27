@@ -148,7 +148,7 @@ class preprocessor(object):
 
         return train_x, train_y, test_x, test_y
 
-    def data_prep(self, train_dirs, test_fold='', segment_size=20480, overlap=0.5, bands=60, frames=41, file_ext="*.wav",
+    def data_prep(self, train_dirs, test_fold='', segment_size=20480, overlap=0.5, bands=200, frames=41, file_ext="*.wav",
                   save_path='', load_path=''):
         """
         Data prep loads all the sound files in train_dirs, then it splits them into segments of segment_size,
@@ -197,8 +197,8 @@ class preprocessor(object):
             self.train_x, self.train_y = self.X, self.y
             self.test_x = np.load(load_path + '/' + test_fold + '/features.npy')
             self.test_y = np.load(load_path + '/' + test_fold + '/labels.npy')
-        else:
-            self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
+        # else:
+            # self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
 
 
 if __name__ == '__main__':
