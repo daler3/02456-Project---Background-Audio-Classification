@@ -1,4 +1,4 @@
-###for aud in *.wav; do ffmpeg -i "$aud" -ar 44100 "data_enc/${aud%.mp3}-enc.wav"; done
+###for aud in *.wav; do ffmpeg -i "$aud" -ar 44100 "fold2/${aud%.mp3}-enc.wav"; done
 import pandas
 import sys
 import wave
@@ -101,114 +101,116 @@ def combine_elements_names(el1, el2, folder_n):
     return pandas.DataFrame([[res_file_name, res_fsID, res_start, res_end, res_salience, folder_name, res_classID, res_class]], columns=list(el1.columns.values)), res_file_name
 
 
+for nf in range (10, 11):
+    #fold_n = 2
+    fold_n = nf
+    df = pandas.read_csv("data/UrbanSound8K/metadata/UrbanSound8K.csv")
+    df_fold1 = df.loc[df['fold'] == fold_n]
 
-df = pandas.read_csv("data/UrbanSound8K/metadata/UrbanSound8K.csv")
-df_fold1 = df.loc[df['fold'] == 1]
+    target_number = 100
 
-target_number = 100
+    ###get all classes separately 
+    air_conditioner_list = df_fold1.loc[df_fold1['class'] == 'air_conditioner']
+    car_horn_list = df_fold1.loc[df_fold1['class'] == 'car_horn']
+    children_playing_list = df_fold1.loc[df_fold1['class'] == 'children_playing']
+    dog_bark_list = df_fold1.loc[df_fold1['class'] == 'dog_bark']
+    drilling_list = df_fold1.loc[df_fold1['class'] == 'drilling']
+    engine_idling_list = df_fold1.loc[df_fold1['class'] == 'engine_idling']
+    gun_shot_list = df_fold1.loc[df_fold1['class'] == 'gun_shot']
+    jackhammer_list = df_fold1.loc[df_fold1['class'] == 'jackhammer']
+    siren_list = df_fold1.loc[df_fold1['class'] == 'siren']
+    street_music_list = df_fold1.loc[df_fold1['class'] == 'street_music']
 
-###get all classes separately 
-air_conditioner_list = df_fold1.loc[df_fold1['class'] == 'air_conditioner']
-car_horn_list = df_fold1.loc[df_fold1['class'] == 'car_horn']
-children_playing_list = df_fold1.loc[df_fold1['class'] == 'children_playing']
-dog_bark_list = df_fold1.loc[df_fold1['class'] == 'dog_bark']
-drilling_list = df_fold1.loc[df_fold1['class'] == 'drilling']
-engine_idling_list = df_fold1.loc[df_fold1['class'] == 'engine_idling']
-gun_shot_list = df_fold1.loc[df_fold1['class'] == 'gun_shot']
-jackhammer_list = df_fold1.loc[df_fold1['class'] == 'jackhammer']
-siren_list = df_fold1.loc[df_fold1['class'] == 'siren']
-street_music_list = df_fold1.loc[df_fold1['class'] == 'street_music']
+    class_list = [air_conditioner_list, car_horn_list, children_playing_list, 
+                 dog_bark_list, drilling_list, engine_idling_list, gun_shot_list,
+                 jackhammer_list, siren_list, street_music_list]
 
-class_list = [air_conditioner_list, car_horn_list, children_playing_list, 
-             dog_bark_list, drilling_list, engine_idling_list, gun_shot_list,
-             jackhammer_list, siren_list, street_music_list]
-
-new_lists = []
-for c in class_list: 
-    if len(c) >= target_number: 
+    new_lists = []
+    for c in class_list: 
+        if len(c) >= target_number: 
+            new_lists.append(c)
+            continue
+        else: 
+            el_needed = target_number - len(c)
+            index = 0
+            for i in range (0, el_needed):
+                element = c.iloc[[index]]
+                rs = element['slice_file_name'].to_string(header=False, index=False).split(";")
+                if len(rs) == 1:
+                    element['slice_file_name'] = element['slice_file_name']+";wn"
+                ###put something in the name of the element
+                ###that makes me understanding that I have to add white noise
+                c = c.append(element, ignore_index=True)  
+                index = index + 1
         new_lists.append(c)
-        continue
-    else: 
-        el_needed = target_number - len(c)
-        index = 0
-        for i in range (0, el_needed):
-            element = c.iloc[[index]]
-            rs = element['slice_file_name'].to_string(header=False, index=False).split(";")
-            if len(rs) == 1:
-                element['slice_file_name'] = element['slice_file_name']+";wn"
-            ###put something in the name of the element
-            ###that makes me understanding that I have to add white noise
-            c = c.append(element, ignore_index=True)  
-            index = index + 1
-    new_lists.append(c)
-    
-index = 0
-for l in new_lists: 
-    new_lists[index] = l.reset_index(drop=True)
-    index += 1
+        
+    index = 0
+    for l in new_lists: 
+        new_lists[index] = l.reset_index(drop=True)
+        index += 1
 
-#shuffle
-index = 0
-for l in new_lists: 
-    new_lists[index] = new_lists[index].sample(frac=1).reset_index(drop=True)
-    index += 1
+    #shuffle
+    index = 0
+    for l in new_lists: 
+        new_lists[index] = new_lists[index].sample(frac=1).reset_index(drop=True)
+        index += 1
 
 
-##take one by one and combine##
-copy_new_lists = new_lists.copy()
-destination_path = "data/UrbanSound8K/audio_overlap/folder1_overlap"
-original_path = "data/UrbanSound8K/audio/fold1"
-#new_csv_list = pandas.DataFrame()
+    folder_number = str(fold_n)
+    ##take one by one and combine##
+    copy_new_lists = new_lists.copy()
+    destination_path = "data/UrbanSound8K/audio_overlap/folder"+folder_number+"_overlap"
+    original_path = "data/UrbanSound8K/audio/fold"+folder_number
+    #new_csv_list = pandas.DataFrame()
 
 
-maxim = 9
-folder_number = "1"
-range_ind = 99
-#for l in new_lists:
-	#print (len(l.index))
-for i in range(0, len(new_lists)-1): ###list of the lists
-	l = copy_new_lists[0]
-	#print (len(copy_new_lists))
-	copy_new_lists.remove(l) #remove that list
-	index = 0
-	#print (len(l.index))
-	#print (l)
-	#print ("ciaociaociao_before")
-	for counter_ind in range(0, range_ind): ##for each element in the first class
-		el = l.iloc[[counter_ind]]
-		#print (el)
-		if index == maxim: 
-			index = 0
-		#retrieve name and row df
-		#from path load
-		#print ("ciaociaociao")
- 		#print (type(el))
-		sound1 = retrieve_audio_from_df(original_path, el) ##retrieve original sound
-		sound2 = retrieve_audio_from_df(original_path, copy_new_lists[index].iloc[[0]]) #retrieve second sound
-		#print (el)
-		#print (copy_new_lists[index].iloc[[0]])
-		###combine the two sounds and save the results
-		res_element_row, el_name = combine_elements_names(el, copy_new_lists[index].iloc[[0]], folder_number) #name of the combined sound
-		#print (res_element_row)
-		combine_sounds(sound1, sound2, destination_path, el_name)
-		if (i==0 and counter_ind == 0):
-			new_csv_list = res_element_row
-			#print (len(new_csv_list.index))
-		else:
-			new_csv_list = new_csv_list.append(res_element_row, ignore_index=True) ##append the element to the pandas df, to be written
-			#print (len(new_csv_list.index))
-		#print (new_csv_list)
-		#print (copy_new_lists[index].iloc[[0]])
-		#print (copy_new_lists[index].iloc[[0]])
-		#print (len(copy_new_lists[index].index))
-		copy_new_lists[index].drop(0, axis=0, inplace=True)
-		#print (len(copy_new_lists[index].index))
-		copy_new_lists[index].reset_index(drop=True, inplace=True) ##remove that element
-		#print (len(copy_new_lists[index].index))
-		#copy_new_lists[index] = copy_new_lists[index][copy_new_lists.slice_file_name != ]
-		index += 1 ## increase  
-	maxim = maxim - 1
-	range_ind = range_ind - 11
+    maxim = 9
+    range_ind = 99
+    #for l in new_lists:
+    	#print (len(l.index))
+    for i in range(0, len(new_lists)-1): ###list of the lists
+    	l = copy_new_lists[0]
+    	#print (len(copy_new_lists))
+    	copy_new_lists.remove(l) #remove that list
+    	index = 0
+    	#print (len(l.index))
+    	#print (l)
+    	#print ("ciaociaociao_before")
+    	for counter_ind in range(0, range_ind): ##for each element in the first class
+    		el = l.iloc[[counter_ind]]
+    		#print (el)
+    		if index == maxim: 
+    			index = 0
+    		#retrieve name and row df
+    		#from path load
+    		#print ("ciaociaociao")
+     		#print (type(el))
+    		sound1 = retrieve_audio_from_df(original_path, el) ##retrieve original sound
+    		sound2 = retrieve_audio_from_df(original_path, copy_new_lists[index].iloc[[0]]) #retrieve second sound
+    		#print (el)
+    		#print (copy_new_lists[index].iloc[[0]])
+    		###combine the two sounds and save the results
+    		res_element_row, el_name = combine_elements_names(el, copy_new_lists[index].iloc[[0]], folder_number) #name of the combined sound
+    		#print (res_element_row)
+    		combine_sounds(sound1, sound2, destination_path, el_name)
+    		if (i==0 and counter_ind == 0):
+    			new_csv_list = res_element_row
+    			#print (len(new_csv_list.index))
+    		else:
+    			new_csv_list = new_csv_list.append(res_element_row, ignore_index=True) ##append the element to the pandas df, to be written
+    			#print (len(new_csv_list.index))
+    		#print (new_csv_list)
+    		#print (copy_new_lists[index].iloc[[0]])
+    		#print (copy_new_lists[index].iloc[[0]])
+    		#print (len(copy_new_lists[index].index))
+    		copy_new_lists[index].drop(0, axis=0, inplace=True)
+    		#print (len(copy_new_lists[index].index))
+    		copy_new_lists[index].reset_index(drop=True, inplace=True) ##remove that element
+    		#print (len(copy_new_lists[index].index))
+    		#copy_new_lists[index] = copy_new_lists[index][copy_new_lists.slice_file_name != ]
+    		index += 1 ## increase  
+    	maxim = maxim - 1
+    	range_ind = range_ind - 11
 
-##save the new cs to a file 
-new_csv_list.to_csv("data/UrbanSound8K/audio_overlap/folder_1_names.csv")
+    ##save the new cs to a file 
+    new_csv_list.to_csv("data/UrbanSound8K/audio_overlap/folder_"+folder_number+"_names.csv")
