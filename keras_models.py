@@ -19,7 +19,7 @@ def piczak_CNN(input_dim, output_dim,
     """
 
     model = Sequential()
-    model.add(Conv2D(80, kernel_size=(57, 6), strides=(1, 1),
+    model.add(Conv2D(80, kernel_size=(input_dim[0]-3, 6), strides=(1, 1),
                      activation=activation,
                      input_shape=input_dim,
                      kernel_regularizer=regularizers.l2(0.001)))
