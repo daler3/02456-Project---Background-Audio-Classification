@@ -23,6 +23,8 @@ class preprocessor(object):
         self.train_y = []
         self.test_x = []
         self.test_y = []
+        self.val_x = []
+        self.val_y = []
 
     def split_sound_into_segments(self, file_name, segment_size, overlap):
         """
@@ -148,65 +150,54 @@ class preprocessor(object):
 
         return train_x, train_y, test_x, test_y
 
-    def data_prep(self, train_dirs, test_fold='', segment_size=20480, overlap=0.5, bands=200, frames=41, file_ext="*.wav",
-                  save_path='', load_path=''):
-        """
-        Data prep loads all the sound files in train_dirs, then it splits them into segments of segment_size,
-        then it extracts features and labels. Finally, it splits the data in train and test and assigns these to variables.
-        """
+    def save_fts_lbs(self, train_dirs, save_path, segment_size, overlap, bands, frames):
+        X_folder, labels_folder = [], []
+        for sub_dir in train_dirs:
+            for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, '*.wav')):
+                try:
+                    # data
+                    segments, labels = self.split_sound_into_segments(fn, segment_size, overlap)
+                    # features
+                    [X_folder.append(self.extract_features_cnn(sample, segment_size, bands, frames)) for sample in
+                     segments]
+                    # labels
+                    [labels_folder.append(label) for label in labels]
+                except Exception as e:
+                    print("Error encountered while parsing file: ", fn, e)
+                    continue
 
-        self.train_dirs = train_dirs
+            directory = save_path + '\\' + sub_dir
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            np.save(directory + '\\features', np.array(X_folder))
+            np.save(directory + '\\labels', self.one_hot_encode(np.array(labels_folder, dtype=np.int)))
+            X_folder, labels_folder = [], []
 
-        if load_path:
-            for dir in train_dirs:
-                fts = np.load(load_path + '/' + dir + '/features.npy')
-                lbs = np.load(load_path + '/' + dir + '/labels.npy')
-                if len(self.X) == 0:
-                    self.X, self.y = fts, lbs
-                else:
-                    self.X = np.concatenate((self.X, fts), axis=0)
-                    self.y = np.concatenate((self.y, lbs), axis=0)
-        else:
-            X_total, labels_total = [], []
-
-            for sub_dir in self.train_dirs:
-                for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, file_ext)):
-                    try:
-                        # data
-                        segments, labels = self.split_sound_into_segments(fn, segment_size, overlap)
-                        # features
-                        [X_total.append(self.extract_features_cnn(sample, segment_size, bands, frames)) for sample in segments]
-                        # labels
-                        [labels_total.append(label) for label in labels]
-                    except Exception as e:
-                        print ("Error encountered while parsing file: ", fn, e)
-                        continue
-                if save_path:
-                    directory = save_path + '\\' + sub_dir
-                    if not os.path.exists(directory):
-                        os.makedirs(directory)
-                    np.save(directory + '\\features', np.array(X_total))
-                    np.save(directory + '\\labels', self.one_hot_encode(np.array(labels_total, dtype=np.int)))
-                    X_total, labels_total = [], []
-
-            self.labels = labels_total
-            self.y = self.one_hot_encode(np.array(labels_total, dtype=np.int))
-            self.X = np.array(X_total)
-
+    def load_extracted_fts_lbs(self, train_dirs, test_fold='', val_fold='', load_path=''):
+        for dir in train_dirs:
+            fts = np.load(load_path + '/' + dir + '/features.npy')
+            lbs = np.load(load_path + '/' + dir + '/labels.npy')
+            if len(self.X) == 0:
+                self.X, self.y = fts, lbs
+            else:
+                self.X = np.concatenate((self.X, fts), axis=0)
+                self.y = np.concatenate((self.y, lbs), axis=0)
         if test_fold:
             self.train_x, self.train_y = self.X, self.y
             self.test_x = np.load(load_path + '/' + test_fold + '/features.npy')
             self.test_y = np.load(load_path + '/' + test_fold + '/labels.npy')
-        # else:
-            # self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
-
+        if val_fold:
+            self.val_x = np.load(load_path + '/' + val_fold + '/features.npy')
+            self.val_y = np.load(load_path + '/' + val_fold + '/labels.npy')
 
 if __name__ == '__main__':
     # Testing the data_preprocessor
     pp = preprocessor()
 
-    # Run this to extract features and save them
-    # (First you have to create the folders)
-    # pp.data_prep(train_dirs=["fold1", "fold2", "fold3", "fold4", "fold5", "fold6", "fold7", "fold8", "fold9", "fold10"], save_path='extracted')
+    train_dirs = ["fold1", "fold2", "fold3", "fold4", "fold5", "fold6", "fold7", "fold8", "fold9", "fold10"]
+
+    pp.save_fts_lbs(train_dirs=train_dirs, save_path='extracted_test', segment_size=20480, overlap=0.5, bands=200, frames=41)
+
+    #pp.load_extracted_fts_lbs(train_dirs=train_dirs, load_path='extracted_short_200')
 
     print("Breakpoint here!")
