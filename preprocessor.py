@@ -141,7 +141,7 @@ class preprocessor(object):
 		n_unique_labels = 10
 		one_hot_encode = np.zeros((n_labels, n_unique_labels))
 		one_hot_encode[np.arange(n_labels), labels] = 1
-
+		# We could just use from keras.utils.np_utils import to_categorical
 		return one_hot_encode
 
 	def get_train_test_split(self, test_split=0.2):

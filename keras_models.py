@@ -8,14 +8,9 @@ from keras import backend as K
 
 # C(ˆ y t ,y t ) = −y t · log(ˆ y t ) − (1 − y t ) · log(1 − ˆ y t ) Loss function defined in the paper
 
-def customLoss(yTrue, yPred):
-	return K.binary_crossentropy(yTrue,yPred,from_logits=True)
-	# K.sum(K.log(yTrue) - K.log(yPred))
-
-
 def piczak_CNN(input_dim, output_dim,
 			   activation='relu', optimizer="adam",
-			   metrics="accuracy", loss='categorical_crossentropy'):
+			   metrics="accuracy", loss='binary_crossentropy'):
 	"""
 	This method returns a keras model describing Piczak implementation.
 
@@ -57,6 +52,7 @@ def piczak_CNN(input_dim, output_dim,
 	model.add(Dense(output_dim))
 	# Removed the softmax output layer as a sigmoid transformation of the output is done by our custom loss function.
 	#model.add(Activation('softmax'))
+	model.add(Activation('sigmoid'))
 	inp = model.input  # input placeholder
 	outputs = [layer.output for layer in model.layers]  # all layer outputs
 	functor = K.function([inp] + [K.learning_phase()], outputs)  # evaluation function
@@ -64,7 +60,7 @@ def piczak_CNN(input_dim, output_dim,
 	print(outputs)
 	print(functor)
 
-	model.compile(loss=customLoss,
+	model.compile(loss=loss,
 				  optimizer=optimizer,
 				  metrics=[metrics])
 
