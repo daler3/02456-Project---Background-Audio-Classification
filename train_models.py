@@ -75,10 +75,10 @@ def scikit_cross_validation(epochs, load_path):
         logging.info("Model built")
 
         model.fit(X_train, y_train, validation_split=0.1, epochs=epochs,
-                  batch_size=1000, verbose=2, callbacks=[tb, es])
+                  batch_size=1000, verbose=2, callbacks=[tb])
         logging.info("Model trained")
 
-        scores = model.evaluate(X_test, y_test, verbose=1)
+        scores = model.evaluate(X_test, y_test, verbose=2)
         # logging.info("loss: {0}, test-acc: {1}".format(scores[0], scores[1]))
         print("loss: {0}, test-acc: {1}".format(scores[0], scores[1]))
         k = k + 1

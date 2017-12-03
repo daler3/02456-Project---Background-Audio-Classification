@@ -153,6 +153,7 @@ class preprocessor(object):
     def save_fts_lbs(self, train_dirs, save_path, segment_size, overlap, bands, frames):
         X_folder, labels_folder = [], []
         for sub_dir in train_dirs:
+            print(sub_dir)
             for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, '*.wav')):
                 try:
                     # data
@@ -189,6 +190,12 @@ class preprocessor(object):
         if val_fold:
             self.val_x = np.load(load_path + '/' + val_fold + '/features.npy')
             self.val_y = np.load(load_path + '/' + val_fold + '/labels.npy')
+        X_mean = np.mean(self.X, axis=0)
+        X_std = np.std(self.X, axis=0)        
+        self.X = (self.X - X_mean) / X_std
+        self.train_x = (self.train_x - X_mean) / X_std
+        self.test_x = (self.test_x - X_mean) / X_std
+        self.val_x = (self.val_x - X_mean) / X_std
 
 if __name__ == '__main__':
     # Testing the data_preprocessor
