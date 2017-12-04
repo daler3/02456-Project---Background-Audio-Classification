@@ -219,6 +219,13 @@ class preprocessor(object):
 		else:
 			self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
 
+		X_mean = np.mean(self.X, axis=0)
+		X_std = np.std(self.X, axis=0)
+		self.X = (self.X - X_mean) / X_std
+		self.train_x = (self.train_x - X_mean) / X_std
+		self.test_x = (self.test_x - X_mean) / X_std
+		self.val_x = (self.val_x - X_mean) / X_std
+
 
 if __name__ == '__main__':
 	# Testing the data_preprocessor
