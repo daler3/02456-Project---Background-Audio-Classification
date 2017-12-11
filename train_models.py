@@ -136,7 +136,7 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 
 	# Run on all audio files in the 10 folders
 	#pp.data_prep(train_dirs=["audio_overlap/folder1_overlap", "audio_overlap/folder2_overlap", "audio_overlap/folder3_overlap", "audio_overlap/folder4_overlap", "audio_overlap/folder5_overlap", "audio_overlap/folder6_overlap", "audio_overlap/folder7_overlap", "audio_overlap/folder8_overlap", "audio_overlap/folder9_overlap","audio_overlap/folder10_overlap"])
-	pp.data_prep(train_dirs=["fold1"])
+	pp.data_prep(train_dirs=["fold0"])
 	#pp.data_prep(train_dirs=train_dirs, load_path=save_dir)
 
 	tb = TensorBoard(log_dir='./TensorBoard')
@@ -164,8 +164,8 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 	print (f1(pp.test_y, preds, average='macro'))
 	np.savetxt("truelabels.txt",np.array(pp.test_y))
 	np.savetxt("writepreds.txt", np.array(preds))
-	write_preds(preds, output_predictions_file)
-	confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
+	#write_preds(preds, output_predictions_file)
+	#confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
 	#utils.plot_confusion_matrix(confusion_matrix, classes)
 
 	#I reach here in plus_one_hot_encode, I want to transform it in one hot
