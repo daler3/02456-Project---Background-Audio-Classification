@@ -1,5 +1,6 @@
 from preprocessor import preprocessor
 from keras_models import piczak_CNN
+from keras_models import piczak_mod_CNN
 from keras.callbacks import TensorBoard
 from sklearn import metrics
 import numpy as np
@@ -130,7 +131,7 @@ def from_plus_to_one_hot(pred_labels):
 def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 					output_predictions_file="./test.csv"):
 
-	pp = preprocessor(parent_dir='../data/UrbanSound8K/audio')
+	pp = preprocessor(parent_dir='../../data/UrbanSound8K/audio')
 	print("Loading the data...")
 
 	# Run on all audio files in the 10 folders
@@ -141,7 +142,7 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 	tb = TensorBoard(log_dir='./TensorBoard')
 
 	print("model creation")
-	model = piczak_CNN(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
+	model = piczak_mod_CNN(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
 
 	print("model fitting")
 	model.fit(pp.train_x, pp.train_y,validation_split=.1, epochs=epochs,
@@ -189,4 +190,8 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 
 if __name__ == '__main__':
 	print("main")
+	classes_number_mapper()
+	print(dic_tot)
+	for i in sorted(dic_tot.keys()):
+		print(i, dic_tot[i])
 	train_keras_cnn()

@@ -224,7 +224,7 @@ class preprocessor(object):
 		self.X = (self.X - X_mean) / X_std
 		self.train_x = (self.train_x - X_mean) / X_std
 		self.test_x = (self.test_x - X_mean) / X_std
-		self.val_x = (self.val_x - X_mean) / X_std
+		#self.val_x = (self.val_x - X_mean) / X_std
 
 
 if __name__ == '__main__':
