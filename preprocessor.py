@@ -186,7 +186,7 @@ class preprocessor(object):
 			X_total, labels_total = [], []
 
 			for sub_dir in self.train_dirs:
-				for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, file_ext))[:100]:
+				for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, file_ext)):
 					try:
 						# data
 						segments, labels = self.split_sound_into_segments(fn, segment_size, overlap)
@@ -203,7 +203,7 @@ class preprocessor(object):
 					if not os.path.exists(directory):
 						os.makedirs(directory)
 					np.save(directory + '\\features', np.array(X_total))
-					np.save(directory + '\\labels', self.one_hot_encode(np.array(labels_total, dtype=np.int)))
+					np.save(directory + '\\labels', self.plus_one_hot_encode(labels_total))
 					X_total, labels_total = [], []
 
 			self.labels = labels_total
@@ -221,7 +221,7 @@ class preprocessor(object):
 
 		X_mean = np.mean(self.X, axis=0)
 		X_std = np.std(self.X, axis=0)
-		self.X = (self.X - X_mean) / X_std
+		#self.X = (self.X - X_mean) / X_std
 		self.train_x = (self.train_x - X_mean) / X_std
 		self.test_x = (self.test_x - X_mean) / X_std
 		#self.val_x = (self.val_x - X_mean) / X_std

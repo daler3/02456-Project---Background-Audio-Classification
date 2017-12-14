@@ -3,6 +3,7 @@ from keras_models import piczak_CNN, piczak_CNN_Salik
 from keras_models import piczak_mod_CNN
 from keras.callbacks import TensorBoard
 from sklearn import metrics
+from keras.models import load_model
 import numpy as np
 import pandas as pd
 import utils
@@ -10,6 +11,7 @@ import sklearn.metrics
 from sklearn.metrics import f1_score,hamming_loss, zero_one_loss
 import matplotlib.pyplot as plt
 from pandas_confusion import ConfusionMatrix
+
 
 classes2 = ['air_conditioner', 'car_horn', 'children_playing', 'dog_bark', 'drilling', 'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music',
 		   'air_conditioner+car_horn', 'air_conditioner+children_playing', 'air_conditioner+dog_bark',
@@ -135,14 +137,18 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 	print("Loading the data...")
 
 	# Run on all audio files in the 10 folders
-	#pp.data_prep(train_dirs=["audio_overlap/folder1_overlap", "audio_overlap/folder2_overlap", "audio_overlap/folder3_overlap", "audio_overlap/folder4_overlap", "audio_overlap/folder5_overlap", "audio_overlap/folder6_overlap", "audio_overlap/folder7_overlap", "audio_overlap/folder8_overlap", "audio_overlap/folder9_overlap","audio_overlap/folder10_overlap"])
-	pp.data_prep(train_dirs=["fold1","fold2","audio_overlap/folder1_overlap","audio_overlap/folder2_overlap"])
+	# MULTI LABEL
+	# train_dirs = ["audio_overlap/folder1_overlap", "audio_overlap/folder2_overlap", "audio_overlap/folder3_overlap", "audio_overlap/folder4_overlap", "audio_overlap/folder5_overlap", "audio_overlap/folder6_overlap", "audio_overlap/folder7_overlap", "audio_overlap/folder8_overlap", "audio_overlap/folder9_overlap","audio_overlap/folder10_overlap"]
+
+	# SINGLE LABEL
+	train_dirs = ["fold1","fold2","fold3","fold4","fold5","fold6","fold7","fold8","fold9","fold10"]
+	pp.data_prep(train_dirs=train_dirs, load_path="../UrbanSound8K/audio/extracted_short_60")
 	#pp.data_prep(train_dirs=train_dirs, load_path=save_dir)
 
-	tb = TensorBoard(log_dir='./TensorBoard/piczak_multi_Salik_lowreg')
+	tb = TensorBoard(log_dir='./TensorBoard/piczak_CNN_singlelabel')
 
 	print("model creation")
-	model = piczak_CNN_Salik(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
+	model = piczak_CNN(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
 
 	print("model fitting")
 	model.fit(pp.train_x, pp.train_y,validation_split=.1, epochs=epochs,
@@ -189,18 +195,63 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 	preds_transf = from_plus_to_one_hot(np.array(preds))
 
 	cm = ConfusionMatrix(np.array(y_test_preds).argmax(1), np.array(preds_transf).argmax(1))
-	#cm.print_stats()
 	print(cm)
-	#print(cm.stats())
-	#cm.print_stats()
+
+	plt.figure(figsize=(64,32))
 	ax = cm.plot()
-	tick_marks = np.arange(len(classes))
 
 	ax.set_xticklabels(classes, rotation="vertical")
 	ax.set_yticklabels(classes)
 	plt.savefig("cmpre.png")
-	plt.savefig("cm.png", dpi = 600)
+	plt.savefig("cm.png", dpi=600)
 
+	model.save("saved/Piczak_CNN_pretrain_single_label.h5")
+
+
+def evaluateSavedModel():
+	model = load_model("saved/Piczak_CNN_pretrainsingle_trainmulti.h5")
+	pp = preprocessor(parent_dir='../UrbanSound8K/audio')
+	train_dirs = ["audio_overlap/folder1_overlap", "audio_overlap/folder2_overlap", "audio_overlap/folder3_overlap", "audio_overlap/folder4_overlap", "audio_overlap/folder5_overlap", "audio_overlap/folder6_overlap", "audio_overlap/folder7_overlap", "audio_overlap/folder8_overlap", "audio_overlap/folder9_overlap","audio_overlap/folder10_overlap"]
+
+	pp.data_prep(train_dirs=[],test_fold="fold2", load_path="../UrbanSound8K/audio/extracted_short_60/")
+
+	tb = TensorBoard(log_dir='./TensorBoard/piczak_CNN_singlelabel_pretrain_continue_multilabel')
+	#model.fit(pp.train_x, pp.train_y,validation_split=.1, epochs=25,
+	#		  batch_size=256, verbose=2, callbacks=[tb])
+
+
+
+	print("model evaluation")
+	scores = model.evaluate(pp.test_x, pp.test_y, verbose=0)
+	print("loss: {0}, test-acc: {1}".format(scores[0], scores[1]))
+
+
+	preds = model.predict(pp.test_x)
+
+	# ************ PROCESSING THE PREDICTIONS
+	preds[preds >= 0.5] = 1
+	preds[preds < 0.5] = 0
+
+	print("F1 SCORE:")
+	print(f1_score(pp.test_y,preds,average=None))
+
+	print("Hamming Loss:")
+	print(hamming_loss(pp.test_y,preds))
+	print("Zero-one loss:")
+	print(zero_one_loss(pp.test_y,preds))
+
+	#I reach here in plus_one_hot_encode, I want to transform it in one hot
+	y_test_preds = from_plus_to_one_hot(np.array(pp.test_y))
+	preds_transf = from_plus_to_one_hot(np.array(preds))
+
+	cm = ConfusionMatrix(np.array(y_test_preds).argmax(1), np.array(preds_transf).argmax(1))
+	print(cm)
+	ax = cm.plot()
+
+	ax.set_xticklabels(classes, rotation="vertical")
+	ax.set_yticklabels(classes)
+	plt.savefig("cmpre.png")
+	plt.savefig("cm.png", dpi=600)
 
 
 
@@ -210,4 +261,5 @@ if __name__ == '__main__':
 	print(dic_tot)
 	for i in sorted(dic_tot.keys()):
 		print(i, dic_tot[i])
-	train_keras_cnn()
+	#train_keras_cnn()
+	evaluateSavedModel()

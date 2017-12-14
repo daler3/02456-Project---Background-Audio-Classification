@@ -1,0 +1,261 @@
+C:\Users\arhjo\AppData\Local\Programs\Python\Python35\python3.exe "C:/Users/arhjo/OneDrive/DTU/Deep Learning/02456-Project/train_models.py"
+Using TensorFlow backend.
+main
+{1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5, 7: 6, 8: 7, 9: 8, 10: 9, 12: 10, 13: 11, 14: 12, 15: 13, 16: 14, 17: 15, 18: 16, 19: 17, 23: 19, 24: 20, 25: 21, 26: 22, 27: 23, 28: 24, 29: 25, 410: 39, 34: 27, 35: 28, 36: 29, 37: 30, 38: 31, 39: 32, 810: 53, 45: 34, 46: 35, 47: 36, 48: 37, 49: 38, 310: 33, 56: 40, 57: 41, 58: 42, 59: 43, 1000000: 55, 67: 45, 68: 46, 69: 47, 710: 51, 78: 49, 79: 50, 210: 26, 910: 54, 89: 52, 610: 48, 110: 18, 510: 44}
+1 0
+2 1
+3 2
+4 3
+5 4
+6 5
+7 6
+8 7
+9 8
+10 9
+12 10
+13 11
+14 12
+15 13
+16 14
+17 15
+18 16
+19 17
+23 19
+24 20
+25 21
+26 22
+27 23
+28 24
+29 25
+34 27
+35 28
+36 29
+37 30
+38 31
+39 32
+45 34
+46 35
+47 36
+48 37
+49 38
+56 40
+57 41
+58 42
+59 43
+67 45
+68 46
+69 47
+78 49
+79 50
+89 52
+110 18
+210 26
+310 33
+410 39
+510 44
+610 48
+710 51
+810 53
+910 54
+1000000 55
+Loading the data...
+model creation
+[<tf.Tensor 'conv2d_1/Relu:0' shape=(?, 4, 36, 80) dtype=float32>, <tf.Tensor 'max_pooling2d_1/MaxPool:0' shape=(?, 1, 12, 80) dtype=float32>, <tf.Tensor 'dropout_1/cond/Merge:0' shape=(?, 1, 12, 80) dtype=float32>, <tf.Tensor 'conv2d_2/Relu:0' shape=(?, 1, 10, 80) dtype=float32>, <tf.Tensor 'max_pooling2d_2/MaxPool:0' shape=(?, 1, 3, 80) dtype=float32>, <tf.Tensor 'flatten_1/Reshape:0' shape=(?, ?) dtype=float32>, <tf.Tensor 'dense_1/BiasAdd:0' shape=(?, 5000) dtype=float32>, <tf.Tensor 'dropout_2/cond/Merge:0' shape=(?, 5000) dtype=float32>, <tf.Tensor 'activation_1/Relu:0' shape=(?, 5000) dtype=float32>, <tf.Tensor 'dense_2/BiasAdd:0' shape=(?, 5000) dtype=float32>, <tf.Tensor 'dropout_3/cond/Merge:0' shape=(?, 5000) dtype=float32>, <tf.Tensor 'activation_2/Relu:0' shape=(?, 5000) dtype=float32>, <tf.Tensor 'dense_3/BiasAdd:0' shape=(?, 10) dtype=float32>, <tf.Tensor 'activation_3/Sigmoid:0' shape=(?, 10) dtype=float32>]
+<keras.backend.tensorflow_backend.Function object at 0x0000023C000CF588>
+Model built
+model fitting
+Train on 22681 samples, validate on 2521 samples
+2017-12-14 14:00:25.852014: W C:\tf_jenkins\home\workspace\rel-win\M\windows-gpu\PY\35\tensorflow\core\platform\cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+2017-12-14 14:00:25.853407: W C:\tf_jenkins\home\workspace\rel-win\M\windows-gpu\PY\35\tensorflow\core\platform\cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+2017-12-14 14:00:26.686360: I C:\tf_jenkins\home\workspace\rel-win\M\windows-gpu\PY\35\tensorflow\core\common_runtime\gpu\gpu_device.cc:955] Found device 0 with properties: 
+name: GeForce GTX 765M
+major: 3 minor: 0 memoryClockRate (GHz) 0.8625
+pciBusID 0000:01:00.0
+Total memory: 2.00GiB
+Free memory: 1.66GiB
+2017-12-14 14:00:26.686821: I C:\tf_jenkins\home\workspace\rel-win\M\windows-gpu\PY\35\tensorflow\core\common_runtime\gpu\gpu_device.cc:976] DMA: 0 
+2017-12-14 14:00:26.686965: I C:\tf_jenkins\home\workspace\rel-win\M\windows-gpu\PY\35\tensorflow\core\common_runtime\gpu\gpu_device.cc:986] 0:   Y 
+2017-12-14 14:00:26.687511: I C:\tf_jenkins\home\workspace\rel-win\M\windows-gpu\PY\35\tensorflow\core\common_runtime\gpu\gpu_device.cc:1045] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GeForce GTX 765M, pci bus id: 0000:01:00.0)
+Epoch 1/25
+23s - loss: 0.4576 - acc: 0.8077 - val_loss: 0.4252 - val_acc: 0.8223
+Epoch 2/25
+21s - loss: 0.4118 - acc: 0.8311 - val_loss: 0.4044 - val_acc: 0.8374
+Epoch 3/25
+23s - loss: 0.3942 - acc: 0.8415 - val_loss: 0.4037 - val_acc: 0.8349
+Epoch 4/25
+22s - loss: 0.3806 - acc: 0.8486 - val_loss: 0.3805 - val_acc: 0.8504
+Epoch 5/25
+22s - loss: 0.3715 - acc: 0.8537 - val_loss: 0.3754 - val_acc: 0.8531
+Epoch 6/25
+22s - loss: 0.3657 - acc: 0.8552 - val_loss: 0.3627 - val_acc: 0.8570
+Epoch 7/25
+22s - loss: 0.3583 - acc: 0.8595 - val_loss: 0.3573 - val_acc: 0.8600
+Epoch 8/25
+22s - loss: 0.3514 - acc: 0.8634 - val_loss: 0.3478 - val_acc: 0.8627
+Epoch 9/25
+22s - loss: 0.3458 - acc: 0.8660 - val_loss: 0.3457 - val_acc: 0.8644
+Epoch 10/25
+21s - loss: 0.3404 - acc: 0.8677 - val_loss: 0.3427 - val_acc: 0.8662
+Epoch 11/25
+22s - loss: 0.3376 - acc: 0.8696 - val_loss: 0.3385 - val_acc: 0.8666
+Epoch 12/25
+22s - loss: 0.3313 - acc: 0.8725 - val_loss: 0.3337 - val_acc: 0.8712
+Epoch 13/25
+22s - loss: 0.3264 - acc: 0.8744 - val_loss: 0.3233 - val_acc: 0.8765
+Epoch 14/25
+22s - loss: 0.3243 - acc: 0.8748 - val_loss: 0.3260 - val_acc: 0.8760
+Epoch 15/25
+22s - loss: 0.3185 - acc: 0.8778 - val_loss: 0.3245 - val_acc: 0.8752
+Epoch 16/25
+22s - loss: 0.3168 - acc: 0.8784 - val_loss: 0.3105 - val_acc: 0.8818
+Epoch 17/25
+22s - loss: 0.3106 - acc: 0.8809 - val_loss: 0.3195 - val_acc: 0.8773
+Epoch 18/25
+22s - loss: 0.3081 - acc: 0.8824 - val_loss: 0.3064 - val_acc: 0.8843
+Epoch 19/25
+23s - loss: 0.3033 - acc: 0.8841 - val_loss: 0.3129 - val_acc: 0.8817
+Epoch 20/25
+22s - loss: 0.3012 - acc: 0.8844 - val_loss: 0.3057 - val_acc: 0.8841
+Epoch 21/25
+22s - loss: 0.2955 - acc: 0.8876 - val_loss: 0.3049 - val_acc: 0.8843
+Epoch 22/25
+23s - loss: 0.2934 - acc: 0.8882 - val_loss: 0.2967 - val_acc: 0.8892
+Epoch 23/25
+23s - loss: 0.2918 - acc: 0.8895 - val_loss: 0.2961 - val_acc: 0.8893
+Epoch 24/25
+23s - loss: 0.2871 - acc: 0.8911 - val_loss: 0.2916 - val_acc: 0.8914
+Epoch 25/25
+22s - loss: 0.2859 - acc: 0.8917 - val_loss: 0.2912 - val_acc: 0.8898
+model evaluation
+loss: 0.2932272776500173, test-acc: 0.8892398938510631
+Writing test predictions to csv file : ./test.csv
+F1 SCORE:
+[ 0.64801865  0.76508344  0.55062305  0.6182414   0.72669683  0.6835443
+  0.73631341  0.77599324  0.66481738  0.68338292]
+Hamming Loss:
+0.11076019679415966
+Zero-one loss:
+0.741787017934
+Predicted    0    1    2    3    4    5    6    7    8    9   ...     47  48  \
+Actual                                                        ...              
+0            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+1            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+2            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+3            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+4            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+5            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+6            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+7            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+8            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+9            0    0    0    0    0    0    0    0    0    0   ...      0   0   
+10          51   41    3    1    1    1    2    5    0    1   ...      0   0   
+11          65    0   24    4    0    1    1    2    2    6   ...      0   1   
+12          54    2    7   30    1    1    1    2    1    1   ...      0   0   
+13          25    0    0    0   41    0    2    6    0    3   ...      0   0   
+14          41    0    3    0    3   52    0    0    0    1   ...      0   2   
+15          36    0    7    0    1    0   39    0    0    0   ...      0   0   
+16          21    0    1    0    2    1    0   62    1    0   ...      0   0   
+17          33    0    2    1    0    2    0    4   61    4   ...      4   0   
+18          29    0    5    0    1    0    0    0    0   42   ...      0   2   
+19           0   55    2    0    0    0    0    1    0    1   ...      0   0   
+20           0   39    6   14    1    0    1    1    0    1   ...      0   0   
+21           0   31    1    0   18    0    0    1    1    1   ...      0   0   
+22           0   58    0    2    0    6    0    4    1    0   ...      0   0   
+23           0   28    0    0    0    0   18    1    0    2   ...      0   0   
+24           0   16    0    0    2    0    0   21    0    2   ...      0   0   
+25           0   31    0    0    0    1    1    1   12    3   ...      1   0   
+26           1   29    1    0    2    0    0    0    0   16   ...      0   1   
+27           1    0   36   32    1    0    0    0    0    0   ...      0   0   
+28           1    0   10    0   66    1    0    2    3    7   ...      0   0   
+29           2    0   36    1    0   42    0    0    1    3   ...      1   5   
+30           0    0   19    1    1    0   41    0    1    1   ...      0   0   
+31           3    0    8    1    0    0    0   77    0    1   ...      0   0   
+32           1    1   32    0    1    0    1    1   47    9   ...      2   0   
+33           2    0   21    1    0    0    0    0    0   41   ...      0   2   
+34           2    0    7   19   18    1    2    4    1    3   ...      0   0   
+35           7    2   10   43    0   30    0    1    0    1   ...      2   1   
+36           2    1    6   32    2    0   29    0    0    0   ...      0   0   
+37           0    0    1   10    0    0    0   34    0    0   ...      0   0   
+38           3    0    8   30    0    0    0    1   18    1   ...      1   0   
+39           0    1    6   29    0    1    0    0    1   36   ...      0   0   
+40           3    2    2    0   31   28    1    4    2    1   ...      1   1   
+41           3    1    2    2   19    0   14    2    0    0   ...      0   0   
+42           1    0    0    0   24    1    1   54    0    0   ...      0   0   
+43           0    0    0    1   35    0    0   13   19    1   ...      1   0   
+44           0    1    1    0   29    0    0    4    0   36   ...      0   0   
+45          10    0    0    0    0   36   23    0    0    0   ...      1   0   
+46           1    0    0    1    2   25    0   54    0    4   ...      1   0   
+47           1    0    2    2    0   38    0    1   25    3   ...     47   4   
+48           0    0    3    0    1   26    0    2    2   36   ...      3  40   
+49           1    0    2    0    0    0   29   20    0    0   ...      0   0   
+50           0    1    1    2    0    0   27    1   12    1   ...      0   0   
+51           0    1    5    0    0    1   28    0    0   19   ...      0   0   
+52           1    0    0    0    0    0    0   65   11    0   ...      0   0   
+53           1    1    2    0    0    0    0   40    0   10   ...      0   0   
+54           1    0    4    0    1    0    0    0   24   25   ...      3   1   
+55           0    0    0    0    0    0    0    0    0    0   ...      0   0   
+__all__    403  342  286  259  304  295  261  491  246  323   ...     68  60   
+
+Predicted  49  50  51  52   53   54   55  __all__  
+Actual                                             
+0           0   0   0   0    0    0    0        0  
+1           0   0   0   0    0    0    0        0  
+2           0   0   0   0    0    0    0        0  
+3           0   0   0   0    0    0    0        0  
+4           0   0   0   0    0    0    0        0  
+5           0   0   0   0    0    0    0        0  
+6           0   0   0   0    0    0    0        0  
+7           0   0   0   0    0    0    0        0  
+8           0   0   0   0    0    0    0        0  
+9           0   0   0   0    0    0    0        0  
+10          0   0   0   0    0    0    6      173  
+11          0   0   0   1    0    0    0      171  
+12          0   0   0   0    0    0    5      158  
+13          0   0   0   2    0    0    3      156  
+14          0   0   0   0    0    0    3      168  
+15          2   0   1   0    0    0    0      163  
+16          1   0   0   4    3    0    0      169  
+17          0   0   0   6    2    7    2      188  
+18          0   0   0   0    7    3    2      176  
+19          0   1   0   0    0    0    4       81  
+20          1   0   0   0    0    0    2       92  
+21          0   0   0   0    0    0    1       90  
+22          0   0   0   0    0    1    2      114  
+23          0   0   1   0    1    0    4       85  
+24          0   0   0   0    1    0    4       94  
+25          0   3   0   1    0    1    2       87  
+26          0   0   3   0    2    1    2       91  
+27          0   0   0   0    0    0    1      147  
+28          0   0   0   0    2    1    8      178  
+29          0   0   0   0    0    0    7      170  
+30          1   0   3   0    0    0    1      174  
+31          0   0   0   4    7    1    3      155  
+32          0   0   0   2    0    6    5      195  
+33          0   0   0   0    2    2    3      164  
+34          0   0   0   0    2    1    6      125  
+35          0   0   0   0    0    0    3      158  
+36          0   0   1   0    0    0    1      138  
+37          0   0   0   4    1    0    2      100  
+38          0   1   1   0    0    4    4      135  
+39          0   0   0   0    1    1    2      124  
+40          0   0   0   0    0    0    4      157  
+41          3   0   0   0    0    0    4      129  
+42          0   0   0   0    4    0    0      155  
+43          0   0   0   4    0    4    0      146  
+44          0   0   0   0    8    1    0      148  
+45          2   0   1   0    0    0    4      185  
+46          1   0   0   0    1    0    2      148  
+47          0   0   0   0    0    1    2      157  
+48          0   0   0   0    1    8    2      167  
+49         12   1   0   2    0    0    1       75  
+50          3  10   1   0    0    4    2       80  
+51          0   0  16   0    0    0    2       81  
+52          0   0   0  57    0    2    1      157  
+53          0   0   0   5   61    0    0      142  
+54          0   0   1   2    2   53    2      155  
+55          0   0   0   0    0    0    0        0  
+__all__    26  16  29  94  108  102  114     6301  
+
+[57 rows x 57 columns]
+
+Process finished with exit code 0

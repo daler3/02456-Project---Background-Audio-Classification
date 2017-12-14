@@ -24,7 +24,7 @@ def constant(const):
 
 def piczak_mod_CNN(input_dim, output_dim,
 				   activation='relu',
-				   metrics="accuracy", loss='binary_crossentropy'):
+				   metrics="accuracy", loss='binary_crossentropy',optimizer="adam"):
 	"""
 	This method returns a keras model describing Piczak implementation.
 
@@ -49,7 +49,7 @@ def piczak_mod_CNN(input_dim, output_dim,
 	model.add(MaxPooling2D(pool_size=(4, 3), strides=(1, 3)))
 	model.add(BatchNormalization())
 	model.add(Activation('relu'))
-	model.add(Dropout(0.75))
+	model.add(Dropout(0.50))
 
 	model.add(Conv2D(80, kernel_size=(1, 3), strides=(1, 1),
 					 activation=None,
@@ -65,24 +65,16 @@ def piczak_mod_CNN(input_dim, output_dim,
 	# Layer 1
 	model.add(Dense(800, kernel_initializer=normal(0.01), kernel_regularizer=regularizers.l2(l2_param)))
 	model.add(Activation('relu'))
-	model.add(Dropout(0.75))
+	model.add(Dropout(0.50))
 
 	# layer 2
 	model.add(Dense(800, kernel_initializer=normal(0.01), kernel_regularizer=regularizers.l2(l2_param)))
 	model.add(Activation('relu'))
-	model.add(Dropout(0.75))
+	model.add(Dropout(0.50))
 
 	# layer
 	model.add(Dense(output_dim, kernel_initializer=normal(0.01), kernel_regularizer=regularizers.l2(l2_param)))
 	model.add(Activation('sigmoid'))
-
-	if input_dim[1] == 41:
-		optimizer = sgd(lr=0.002, momentum=0.9, nesterov=True)
-	else:
-		if input_dim[1] == 101:
-			optimizer = sgd(lr=0.01, momentum=0.9, nesterov=True)
-		else:
-			raise ValueError("Segment must either have 41 or 101 frames")
 
 	model.compile(loss=loss,
 				  optimizer=optimizer,
