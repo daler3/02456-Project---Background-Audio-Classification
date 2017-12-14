@@ -17,10 +17,8 @@ df = pd.read_excel(file_name)
 data = df.values
 
 colors = ['lightblue', 'lightgreen','lightblue', 'lightgreen']
-labels = ['Pretrain overlay', 'Pretrain single','Posttrain overlay', 'Posttrain single']
-ax = df.boxplot(return_type='axes')
-
-
+labels = ['Train: Single  - Test: Overlay', 'Train: Single - Test: Single','Train: Single + Overlay - Test: Overlay', 'Train: Single + Overlay - Test: Single']
+# ax = df.boxplot(return_type='axes')
 fig, ax = plt.subplots()
 bp = ax.boxplot(data,
             vert=True,  # vertical box alignment
