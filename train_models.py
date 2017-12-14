@@ -1,5 +1,5 @@
 from preprocessor import preprocessor
-from keras_models import piczak_CNN
+from keras_models import piczak_CNN, piczak_CNN_Salik
 from keras_models import piczak_mod_CNN
 from keras.callbacks import TensorBoard
 from sklearn import metrics
@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import utils
 import sklearn.metrics
-from sklearn.metrics import f1_score as f1
+from sklearn.metrics import f1_score,hamming_loss, zero_one_loss
 import matplotlib.pyplot as plt
 from pandas_confusion import ConfusionMatrix
 
@@ -131,18 +131,18 @@ def from_plus_to_one_hot(pred_labels):
 def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 					output_predictions_file="./test.csv"):
 
-	pp = preprocessor(parent_dir='../../data/UrbanSound8K/audio')
+	pp = preprocessor(parent_dir='../UrbanSound8K/audio')
 	print("Loading the data...")
 
 	# Run on all audio files in the 10 folders
 	#pp.data_prep(train_dirs=["audio_overlap/folder1_overlap", "audio_overlap/folder2_overlap", "audio_overlap/folder3_overlap", "audio_overlap/folder4_overlap", "audio_overlap/folder5_overlap", "audio_overlap/folder6_overlap", "audio_overlap/folder7_overlap", "audio_overlap/folder8_overlap", "audio_overlap/folder9_overlap","audio_overlap/folder10_overlap"])
-	pp.data_prep(train_dirs=["fold1"])
+	pp.data_prep(train_dirs=["fold1","fold2","audio_overlap/folder1_overlap","audio_overlap/folder2_overlap"])
 	#pp.data_prep(train_dirs=train_dirs, load_path=save_dir)
 
-	tb = TensorBoard(log_dir='./TensorBoard')
+	tb = TensorBoard(log_dir='./TensorBoard/piczak_multi_Salik_lowreg')
 
 	print("model creation")
-	model = piczak_mod_CNN(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
+	model = piczak_CNN_Salik(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
 
 	print("model fitting")
 	model.fit(pp.train_x, pp.train_y,validation_split=.1, epochs=epochs,
@@ -158,14 +158,30 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 		pd.DataFrame({"Predictions": preds, "Actual": np.array(pp.test_y).argmax(1)}).to_csv(fname, index=False, header=True)
 
 	preds = model.predict(pp.test_x)
+
+	np.savetxt("postpreds.txt", np.array(preds))
+
+	# ************ PROCESSING THE PREDICTIONS
 	preds[preds >= 0.5] = 1
 	preds[preds < 0.5] = 0
 
-	print (f1(pp.test_y, preds, average='macro'))
 	np.savetxt("truelabels.txt",np.array(pp.test_y))
 	np.savetxt("writepreds.txt", np.array(preds))
-	write_preds(preds, output_predictions_file)
-	confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
+	#write_preds(preds, output_predictions_file)
+	print("F1 SCORE:")
+	print(f1_score(pp.test_y,preds,average=None))
+
+	print("Hamming Loss:")
+	print(hamming_loss(pp.test_y,preds))
+	print("Zero-one loss:")
+	print(zero_one_loss(pp.test_y,preds))
+
+	#write_preds(preds, output_predictions_file)
+	#confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
+	#utils.plot_confusion_matrix(confusion_matrix, classes)
+
+
+	#confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
 	#utils.plot_confusion_matrix(confusion_matrix, classes)
 
 	#I reach here in plus_one_hot_encode, I want to transform it in one hot
@@ -174,7 +190,7 @@ def train_keras_cnn(epochs=25, output_model_file="./piczak_model_fold1_only.h5",
 
 	cm = ConfusionMatrix(np.array(y_test_preds).argmax(1), np.array(preds_transf).argmax(1))
 	#cm.print_stats()
-	print (cm)
+	print(cm)
 	#print(cm.stats())
 	#cm.print_stats()
 	ax = cm.plot()

@@ -186,7 +186,7 @@ class preprocessor(object):
 			X_total, labels_total = [], []
 
 			for sub_dir in self.train_dirs:
-				for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, file_ext)):
+				for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, file_ext))[:100]:
 					try:
 						# data
 						segments, labels = self.split_sound_into_segments(fn, segment_size, overlap)
