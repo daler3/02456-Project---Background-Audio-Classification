@@ -23,6 +23,9 @@ class preprocessor(object):
 		self.train_y = []
 		self.test_x = []
 		self.test_y = []
+		self.val_x = []
+		self.val_y = []
+
 
 	def split_sound_into_segments(self, file_name, segment_size, overlap):
 		"""
@@ -164,7 +167,7 @@ class preprocessor(object):
 
 		return train_x, train_y, test_x, test_y
 
-	def data_prep(self, train_dirs, test_fold='', segment_size=20480, overlap=0.5, bands=60, frames=41, file_ext="*.wav",
+	def data_prep(self, train_dirs, test_fold='', val_fold='', segment_size=20480, overlap=0.5, bands=60, frames=41, file_ext="*.wav",
 				  save_path='', load_path=''):
 		"""
 		Data prep loads all the sound files in train_dirs, then it splits them into segments of segment_size,
@@ -211,6 +214,9 @@ class preprocessor(object):
 			self.y = self.plus_one_hot_encode(labels_total)
 			#self.y = self.one_hot_encode(np.array(labels_total, dtype=np.int))
 			self.X = np.array(X_total)
+		if val_fold:
+			self.val_x = np.load(load_path + '/' + val_fold + '/features.npy')
+			self.val_y = np.load(load_path + '/' + val_fold + '/labels.npy')
 
 		if test_fold:
 			self.train_x, self.train_y = self.X, self.y
@@ -219,12 +225,14 @@ class preprocessor(object):
 		else:
 			self.train_x, self.train_y, self.test_x, self.test_y = self.get_train_test_split()
 
-		X_mean = np.mean(self.X, axis=0)
-		X_std = np.std(self.X, axis=0)
+		X_mean = np.mean(self.train_x, axis=0)
+		X_std = np.std(self.train_x, axis=0)
 		#self.X = (self.X - X_mean) / X_std
 		self.train_x = (self.train_x - X_mean) / X_std
-		self.test_x = (self.test_x - X_mean) / X_std
-		#self.val_x = (self.val_x - X_mean) / X_std
+		if test_fold:
+			self.test_x = (self.test_x - X_mean) / X_std
+		if val_fold:
+			self.val_x = (self.val_x - X_mean) / X_std
 
 
 if __name__ == '__main__':
