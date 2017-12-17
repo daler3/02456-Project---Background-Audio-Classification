@@ -239,7 +239,7 @@ def evaluateSavedModel():
 	evaluateModel(pp, preds)
 
 
-def evaluateModel(pp, preds):
+def evaluateModel(pp, preds, fold):
 	# ************ PROCESSING THE PREDICTIONS
 	preds[preds >= 0.5] = 1
 	preds[preds < 0.5] = 0
@@ -257,9 +257,7 @@ def evaluateModel(pp, preds):
 	ax = cm.plot()
 	ax.set_xticklabels(classes, rotation="vertical")
 	ax.set_yticklabels(classes)
-	plt.savefig("cmpre.png")
-	plt.savefig("cm.png", dpi=600)
-
+	plt.savefig("cmpre{0}.png".format(fold))
 
 
 
@@ -273,18 +271,18 @@ def piczac_cross_validation(epochs, load_path):
 
 	for i in range(1, n_folders + 1):
 		#train_dirs.append('fold{0}'.format(i))
-		train_dirs.append('fold{0}_overlap_30dB'.format(i))
+		train_dirs.append('folder{0}_overlap'.format(i))
 
 	print(train_dirs)
-	for fold in [(9, 10)]:
-		val_fold = 'fold{0}_overlap_30dB'.format(fold[0])
-		test_fold = 'fold{0}_overlap_30dB'.format(fold[1])
+	for fold in [(9, 10), (2, 5), (6, 7)]:
+		val_fold = 'folder{0}_overlap'.format(fold[0])
+		test_fold = 'folder{0}_overlap'.format(fold[1])
 		#val_fold = 'fold{0}'.format(fold[0])
 		#test_fold = 'fold{0}'.format(fold[1])
 		train_dirs.remove(val_fold)
 		train_dirs.remove(test_fold)
 
-		pp = preprocessor(parent_dir='../../data/UrbanSound8K/audio_overlap_9010')
+		pp = preprocessor(parent_dir='../../data/UrbanSound8K/audio')
 		pp.data_prep(train_dirs=train_dirs, val_fold=val_fold, test_fold=test_fold, load_path=load_path)
 
 		model = piczak_CNN(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
@@ -295,7 +293,7 @@ def piczac_cross_validation(epochs, load_path):
 		#model.optimizer.lr.set_value(0.0001)
 		#model.save('Models/model1_all_p2_bn{0}.h5'.format(str(fold)))
 		#model = load_model('Models/model1_all_p2{0}.h5'.format(str(fold)))
-		model = load_model('Models/model1_all_p2_bnsec_overlap_{0}.h5'.format(str(fold)))
+		#model = load_model('Models/model1_all_p2_bnsec_overlap_{0}.h5'.format(str(fold)))
 
 
 
@@ -305,10 +303,10 @@ def piczac_cross_validation(epochs, load_path):
 
 		model.fit(pp.train_x, pp.train_y, validation_data=[pp.val_x, pp.val_y], epochs=epochs,
 				  batch_size=1000, verbose=2, callbacks=[tb, es])
-		model.save('Models/model1_all_p2_bnsec_overlap_9010_{0}.h5'.format(str(fold)))
+		#model.save('Models/model1_all_p2_bnsec_overlap_9010_{0}.h5'.format(str(fold)))
 
 		preds = model.predict(pp.test_x)
-		evaluateModel(pp,preds)
+		evaluateModel(pp,preds, fold)
 
 		K.clear_session()
 
@@ -328,5 +326,5 @@ if __name__ == '__main__':
 		print(i, dic_tot[i])
 	# train_keras_cnn()
 	#evaluateSavedModel()
-	#piczac_cross_validation(25, "../UrbanSound8K/audio/extracted_short_60")
-	piczac_cross_validation(125, "../../feat_overlap_diff")
+	piczac_cross_validation(125, "../UrbanSound8K/audio/extracted_overlapping_50/audio_overlap")
+	#piczac_cross_validation(125, "../../feat_overlap_diff")
