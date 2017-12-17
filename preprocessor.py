@@ -153,7 +153,7 @@ class preprocessor(object):
     def save_fts_lbs(self, train_dirs, save_path, segment_size, overlap, bands, frames):
         X_folder, labels_folder = [], []
         for sub_dir in train_dirs:
-            print(sub_dir)
+            print('extracting ' + sub_dir)
             for fn in glob.glob(os.path.join(self.parent_dir, sub_dir, '*.wav')):
                 try:
                     # data
@@ -167,11 +167,11 @@ class preprocessor(object):
                     print("Error encountered while parsing file: ", fn, e)
                     continue
 
-            directory = save_path + '\\' + sub_dir
+            directory = save_path + '/' + sub_dir
             if not os.path.exists(directory):
                 os.makedirs(directory)
-            np.save(directory + '\\features', np.array(X_folder))
-            np.save(directory + '\\labels', self.one_hot_encode(np.array(labels_folder, dtype=np.int)))
+            np.save(directory + '/features', np.array(X_folder))
+            np.save(directory + '/labels', self.one_hot_encode(np.array(labels_folder, dtype=np.int)))
             X_folder, labels_folder = [], []
 
     def load_extracted_fts_lbs(self, train_dirs, test_fold='', val_fold='', load_path=''):
@@ -185,17 +185,22 @@ class preprocessor(object):
                 self.y = np.concatenate((self.y, lbs), axis=0)
         if test_fold:
             self.train_x, self.train_y = self.X, self.y
+            self.X, self.y = [], []
             self.test_x = np.load(load_path + '/' + test_fold + '/features.npy')
             self.test_y = np.load(load_path + '/' + test_fold + '/labels.npy')
-        if val_fold:
-            self.val_x = np.load(load_path + '/' + val_fold + '/features.npy')
-            self.val_y = np.load(load_path + '/' + val_fold + '/labels.npy')
-        X_mean = np.mean(self.X, axis=0)
-        X_std = np.std(self.X, axis=0)        
-        self.X = (self.X - X_mean) / X_std
+            if val_fold:
+                self.val_x = np.load(load_path + '/' + val_fold + '/features.npy')
+                self.val_y = np.load(load_path + '/' + val_fold + '/labels.npy')
+        else:
+            self.train_x, self.train_y = self.X, self.y
+
+        X_mean = np.mean(self.train_x, axis=0)
+        X_std = np.std(self.train_x, axis=0)
         self.train_x = (self.train_x - X_mean) / X_std
-        self.test_x = (self.test_x - X_mean) / X_std
-        self.val_x = (self.val_x - X_mean) / X_std
+        if test_fold:
+            self.test_x = (self.test_x - X_mean) / X_std
+            if val_fold:
+                self.val_x = (self.val_x - X_mean) / X_std
 
 if __name__ == '__main__':
     # Testing the data_preprocessor
@@ -203,7 +208,7 @@ if __name__ == '__main__':
 
     train_dirs = ["fold1", "fold2", "fold3", "fold4", "fold5", "fold6", "fold7", "fold8", "fold9", "fold10"]
 
-    pp.save_fts_lbs(train_dirs=train_dirs, save_path='extracted_test', segment_size=20480, overlap=0.5, bands=200, frames=41)
+    pp.save_fts_lbs(train_dirs=train_dirs, save_path='extracted_long_200', segment_size=51200, overlap=0.9, bands=200, frames=101)
 
     #pp.load_extracted_fts_lbs(train_dirs=train_dirs, load_path='extracted_short_200')
 
