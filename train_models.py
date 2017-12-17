@@ -1,6 +1,7 @@
+import matplotlib
+matplotlib.use('Agg')
 from preprocessor import preprocessor
-from keras_models import piczak_CNN, piczak_CNN_Salik
-from keras_models import piczak_mod_CNN
+from keras_models import piczak_CNN, piczak_CNN_Salik, piczak_mod_CNN, piczak_mod_CNN2
 from keras.callbacks import TensorBoard, EarlyStopping
 from sklearn import metrics
 from keras.models import load_model
@@ -12,6 +13,7 @@ from sklearn.metrics import f1_score, hamming_loss, zero_one_loss
 import matplotlib.pyplot as plt
 from pandas_confusion import ConfusionMatrix
 import keras.backend as K
+import tensorflow as tf
 
 classes2 = ['air_conditioner', 'car_horn', 'children_playing', 'dog_bark', 'drilling', 'engine_idling', 'gun_shot',
 			'jackhammer', 'siren', 'street_music',
@@ -125,7 +127,6 @@ def from_plus_to_one_hot(pred_labels):
 		if len(temp_index) > 1:
 			t_1 = temp_index[0] + 1
 			t_2 = temp_index[1] + 1
-			final_conv_labels.append(int(str(t_1) + str(t_2)))
 	final_conv_labels_1hot = transform_labels_numbers(final_conv_labels)
 	# for f in final_conv_labels:
 	#	final_conv_labels_1hot.append(f - 1)
@@ -220,7 +221,8 @@ def evaluateSavedModel():
 				  "audio_overlap/folder7_overlap", "audio_overlap/folder8_overlap", "audio_overlap/folder9_overlap",
 				  "audio_overlap/folder10_overlap"]
 
-	pp.data_prep(train_dirs=[], test_fold="fold2", load_path="../UrbanSound8K/audio/extracted_short_60/")
+	#pp.data_prep(train_dirs=[], test_fold="fold2", load_path="../UrbanSound8K/audio/extracted_short_60/")
+	pp.data_prep(train_dirs=train_dirs, test_fold="fold2", save_path='../extracted_feat/')
 
 	tb = TensorBoard(log_dir='./TensorBoard/piczak_CNN_singlelabel_pretrain_continue_multilabel')
 	# model.fit(pp.train_x, pp.train_y,validation_split=.1, epochs=25,
@@ -270,22 +272,30 @@ def piczac_cross_validation(epochs, load_path):
 	n_folders = 10
 
 	for i in range(1, n_folders + 1):
-		train_dirs.append('fold{0}'.format(i))
+		#train_dirs.append('fold{0}'.format(i))
+		train_dirs.append('fold{0}_overlap_30dB'.format(i))
 
 	print(train_dirs)
-	for fold in [(10, 1)]:
-		val_fold = 'fold{0}'.format(fold[0])
-		test_fold = 'fold{0}'.format(fold[1])
+	for fold in [(9, 10)]:
+		val_fold = 'fold{0}_overlap_30dB'.format(fold[0])
+		test_fold = 'fold{0}_overlap_30dB'.format(fold[1])
+		#val_fold = 'fold{0}'.format(fold[0])
+		#test_fold = 'fold{0}'.format(fold[1])
 		train_dirs.remove(val_fold)
 		train_dirs.remove(test_fold)
 
-		pp = preprocessor(parent_dir='../UrbanSound8K/audio')
-		pp.data_prep(load_path=load_path, train_dirs=train_dirs, val_fold=val_fold, test_fold=test_fold)
+		pp = preprocessor(parent_dir='../../data/UrbanSound8K/audio_overlap_9010')
+		pp.data_prep(train_dirs=train_dirs, val_fold=val_fold, test_fold=test_fold, load_path=load_path)
 
 		model = piczak_CNN(input_dim=pp.train_x[0].shape, output_dim=pp.train_y.shape[1])
-
-
-		#model = load_model('Models/short60_300_{0}.h5'.format(str(fold)))
+		print ("done")
+		print("OPTIMIZER")
+		#print(model.optimizer.lr)
+		#K.set_value(model.optimizer.lr, 0.002)
+		#model.optimizer.lr.set_value(0.0001)
+		#model.save('Models/model1_all_p2_bn{0}.h5'.format(str(fold)))
+		#model = load_model('Models/model1_all_p2{0}.h5'.format(str(fold)))
+		model = load_model('Models/model1_all_p2_bnsec_overlap_{0}.h5'.format(str(fold)))
 
 
 
@@ -295,7 +305,7 @@ def piczac_cross_validation(epochs, load_path):
 
 		model.fit(pp.train_x, pp.train_y, validation_data=[pp.val_x, pp.val_y], epochs=epochs,
 				  batch_size=1000, verbose=2, callbacks=[tb, es])
-
+		model.save('Models/model1_all_p2_bnsec_overlap_9010_{0}.h5'.format(str(fold)))
 
 		preds = model.predict(pp.test_x)
 		evaluateModel(pp,preds)
@@ -309,6 +319,8 @@ def piczac_cross_validation(epochs, load_path):
 
 
 if __name__ == '__main__':
+	K.clear_session()
+	tf.reset_default_graph()
 	print("main")
 	classes_number_mapper()
 	print(dic_tot)
@@ -316,4 +328,5 @@ if __name__ == '__main__':
 		print(i, dic_tot[i])
 	# train_keras_cnn()
 	#evaluateSavedModel()
-	piczac_cross_validation(25, "../UrbanSound8K/audio/extracted_short_60")
+	#piczac_cross_validation(25, "../UrbanSound8K/audio/extracted_short_60")
+	piczac_cross_validation(125, "../../feat_overlap_diff")

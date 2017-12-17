@@ -10,7 +10,7 @@ class preprocessor(object):
 	label in X and y.
 	Then, it splits the data in training and test data, saving it in train_x, train_y, test_x and test_y.
 	"""
-	def __init__(self, parent_dir='data/UrbanSound8K/audio'):
+	def __init__(self, parent_dir='../../data/UrbanSound8K/audio'):
 		np.random.seed(23)
 		self.parent_dir = parent_dir
 		self.train_dirs = ''
@@ -202,11 +202,11 @@ class preprocessor(object):
 						print ("Error encountered while parsing file: ", fn, e)
 						continue
 				if save_path:
-					directory = save_path + '\\' + sub_dir
+					directory = save_path + '/' + sub_dir
 					if not os.path.exists(directory):
 						os.makedirs(directory)
-					np.save(directory + '\\features', np.array(X_total))
-					np.save(directory + '\\labels', self.plus_one_hot_encode(labels_total))
+					np.save(directory + '/features', np.array(X_total))
+					np.save(directory + '/labels', self.plus_one_hot_encode(labels_total))
 					X_total, labels_total = [], []
 
 			self.labels = labels_total

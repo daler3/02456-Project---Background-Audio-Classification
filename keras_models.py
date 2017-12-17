@@ -21,6 +21,70 @@ def constant(const):
 
 
 # C(ˆ y t ,y t ) = −y t · log(ˆ y t ) − (1 − y t ) · log(1 − ˆ y t ) Loss function defined in the paper
+def piczak_mod_CNN2(input_dim, output_dim,
+				   activation='relu',
+				   metrics="accuracy", loss='binary_crossentropy', optimizer='Adam'):
+	"""
+	This method returns a keras model describing Piczak implementation.
+
+	From Piczak:
+	The first convolutional ReLU layer consisted of 80 filters
+	of rectangular shape (57x6 size, 1x1 stride) allowing
+	for slight frequency invariance. Max-pooling was applied
+	with a pool shape of 4x3 and stride of 1x3
+	Original implementation in pylearn2 can be found here:
+	https://github.com/karoldvl/paper-2015-esc-convnet/blob/master/Code/_Networks/Net-DoubleConv.ipynb
+	"""
+	# l2_param = 0.01
+	l2_param = 0.01
+	model = Sequential()
+	model.add(Conv2D(80, kernel_size=(57, 6), strides=(1, 1),
+					 activation=None,
+					 input_shape=input_dim,
+					 kernel_initializer=uniform(0.001),
+					 bias_initializer=constant(0.1),
+					 kernel_regularizer=regularizers.l2(l2_param)))
+
+	model.add(MaxPooling2D(pool_size=(4, 3), strides=(1, 3)))
+	model.add(BatchNormalization())
+	model.add(Activation('relu'))
+	#model.add(Activation('relu'))
+	model.add(Dropout(0.50))
+
+	model.add(Conv2D(80, kernel_size=(1, 3), strides=(1, 1),
+					 activation=None,
+					 kernel_initializer=uniform(0.1),
+					 kernel_regularizer=regularizers.l2(l2_param)))
+
+	model.add(MaxPooling2D(pool_size=(1, 3), strides=(1, 3)))
+	model.add(BatchNormalization())
+	model.add(Activation('relu'))
+
+	model.add(Flatten())
+
+	# Layer 1
+	model.add(Dense(1500, kernel_initializer=normal(0.01), kernel_regularizer=regularizers.l2(l2_param)))
+	model.add(Activation('relu'))
+	model.add(Dropout(0.50))
+
+	# layer 2
+	model.add(Dense(1500, kernel_initializer=normal(0.01), kernel_regularizer=regularizers.l2(l2_param)))
+	model.add(Activation('relu'))
+	model.add(Dropout(0.50))
+
+	# layer
+	model.add(Dense(output_dim, kernel_initializer=normal(0.01), kernel_regularizer=regularizers.l2(l2_param)))
+	model.add(Activation('sigmoid'))
+
+	model.compile(loss=loss,
+				  optimizer=optimizer,
+				  metrics=[metrics])
+
+	return model
+
+
+
+
 
 def piczak_mod_CNN(input_dim, output_dim,
 				   activation='relu',
@@ -37,7 +101,7 @@ def piczak_mod_CNN(input_dim, output_dim,
 	https://github.com/karoldvl/paper-2015-esc-convnet/blob/master/Code/_Networks/Net-DoubleConv.ipynb
 	"""
 	# l2_param = 0.01
-	l2_param = 0.0004
+	l2_param = 0.01
 	model = Sequential()
 	model.add(Conv2D(80, kernel_size=(input_dim[0] - 3, 6), strides=(1, 1),
 					 activation=None,
@@ -96,18 +160,22 @@ def piczak_CNN(input_dim, output_dim,
 
 	model = Sequential()
 	model.add(Conv2D(80, kernel_size=(57, 6,), strides=(1, 1),
-					 activation=activation,
+					 activation=None,
 					 input_shape=input_dim,
 					 kernel_regularizer=regularizers.l2(0.001)))
 
 	model.add(MaxPooling2D(pool_size=(4, 3), strides=(1, 3)))
+	model.add(BatchNormalization())
+	model.add(Activation('relu'))
 	model.add(Dropout(0.5))
 
 	model.add(Conv2D(80, kernel_size=(1, 3), strides=(1, 1),
-					 activation=activation,
+					 activation=None,
 					 input_shape=input_dim))
 
 	model.add(MaxPooling2D(pool_size=(1, 3), strides=(1, 3)))
+	model.add(BatchNormalization())
+	model.add(Activation('relu'))
 
 	model.add(Flatten())
 
