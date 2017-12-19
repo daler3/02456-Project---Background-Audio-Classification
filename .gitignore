@@ -103,3 +103,4 @@ TensorBoard/
 *.h5
 .vscode/
 .idea/
+*.ppk
