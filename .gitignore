@@ -104,3 +104,4 @@ TensorBoard/
 .vscode/
 .idea/
 *.ppk
+*.pem
