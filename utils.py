@@ -75,4 +75,3 @@ def save_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.savefig("confusion_matrix/cm.png", dpi=300)
->>>>>>> ec6b52381c809683f2efbf367289b6841fed5ba2

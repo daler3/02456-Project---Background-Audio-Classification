@@ -128,7 +128,7 @@ def scikit_cross_validation(epochs, load_path):
 if __name__ == '__main__':
     # if using long segments, use 150 epochs. if using short, use 300
     # change tensorboard folder and model output file
-    piczac_cross_validation(epochs=300, load_path='extracted_short_60')
+    piczac_cross_validation(epochs=300, load_path='E:\\Deep Learning Datasets\\UrbanSound8K\\extracted_short_60')
     #scikit_cross_validation(epochs=150, load_path='extracted_long_60')
     #model_filename = 'models/long60/long60_150_(9, 10).h5'
     #load_path = 'data/extracted_long_60'
