@@ -36,13 +36,9 @@ def retrieve_audio_from_df(or_path, element_df):
     rs = element_df['slice_file_name'].to_string(header=False, index=False).split(";")
     if len(rs) > 1: ##then wn
         path = or_path + "/" + rs[0]
-        #print (path)
         sound = AudioSegment.from_file(path)
-        #sound_with_wn = add_white_noise(sound) #eliminate it for now
-        #sound = sound_with_wn
     else: 
         path = or_path + "/" + rs[0]
-        #print (path)
         sound = AudioSegment.from_file(path)
 
     return sound
@@ -53,7 +49,6 @@ def combine_elements_names(el1, el2, folder_n):
     splitted_file_name1 = s_file_name1.split(".")[0].split("-")
     splitted_file_name2 = s_file_name2.split(".")[0].split("-")
     res_file_name = splitted_file_name1[0]+"+"+splitted_file_name2[0] + "-" + splitted_file_name1[1]+"+"+splitted_file_name2[1] + "-" + splitted_file_name1[2]+"+"+splitted_file_name2[2] + "-" + splitted_file_name1[3]+"+"+splitted_file_name2[3] + ".wav"
-    #res_file_name = s_file_name1+"+"+s_file_name2
     
     fsID1 = el1['fsID'].to_string(header=False, index=False)
     fsID2 = el2['fsID'].to_string(header=False, index=False)
@@ -145,16 +140,12 @@ for nf in range (1, 11): #folder_range
     copy_new_lists = new_lists.copy()
     destination_path = "data/UrbanSound8K/audio_overlap_diff_volumes/folder"+folder_number+"_overlap_diffvol"
     original_path = "data/UrbanSound8K/audio/fold"+folder_number
-    #new_csv_list = pandas.DataFrame()
 
 
     maxim = 9
     range_ind = 99
-    #for l in new_lists:
-    	#print (len(l.index))
     for i in range(0, len(new_lists)-1): ###list of the lists
         l = copy_new_lists[0]
-    	#print (len(copy_new_lists))
         copy_new_lists.remove(l) #remove that list
         index = 0
         count_diff_vol = 0
@@ -174,24 +165,18 @@ for nf in range (1, 11): #folder_range
                 sound2 = sound2.apply_gain(reduction_vol) 
                 ###combine the two sounds and save the results
                 res_element_row, el_name = combine_elements_names(el, copy_new_lists[index].iloc[[0]], folder_number) #name of the combined sound
-                #print (res_element_row)
             else:
                 sound1 = sound1.apply_gain(reduction_vol) 
                 ###combine the two sounds and save the results
                 res_element_row, el_name = combine_elements_names(copy_new_lists[index].iloc[[0]], el, folder_number) #name of the combined sound
-                #print (res_element_row)
             combine_sounds(sound1, sound2, destination_path, el_name)
             if (i==0 and counter_ind == 0):
                 new_csv_list = res_element_row
-    			#print (len(new_csv_list.index))
             else:
                 new_csv_list = new_csv_list.append(res_element_row, ignore_index=True) ##append the element to the pandas df, to be written
 
             copy_new_lists[index].drop(0, axis=0, inplace=True)
-            #print (len(copy_new_lists[index].index))
             copy_new_lists[index].reset_index(drop=True, inplace=True) ##remove that element
-    		#print (len(copy_new_lists[index].index))
-    		#copy_new_lists[index] = copy_new_lists[index][copy_new_lists.slice_file_name != ]
             index += 1 ## increase  
             #switch volumes
             if(count_diff_vol == 0): 
