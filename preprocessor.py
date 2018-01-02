@@ -130,6 +130,20 @@ class preprocessor(object):
 
         return one_hot_encode
 
+    def plus_one_hot_encode(self,labels):
+        '''
+        Convert labels for single- and multilabel samples into more-than-one-hot encoding.
+        '''
+        n_labels = len(labels)
+        n_unique_labels = 10
+
+        hot_encode = np.zeros((n_labels,n_unique_labels))
+        for i,lab in enumerate(labels):
+            ## Assuming + as seperator between labels in audio file name
+            for j in lab.split('+'):
+                hot_encode[i][int(j)] = 1
+        return hot_encode
+
     def get_train_test_split(self, test_split=0.2):
         """
         Generates the split of training/test using the numpy seed
@@ -150,7 +164,7 @@ class preprocessor(object):
 
         return train_x, train_y, test_x, test_y
 
-    def save_fts_lbs(self, train_dirs, save_path, segment_size, overlap, bands, frames):
+    def save_fts_lbs(self, train_dirs, save_path, segment_size, overlap, bands, frames, classificationtask = "single"):
         X_folder, labels_folder = [], []
         for sub_dir in train_dirs:
             print('extracting ' + sub_dir)
@@ -171,7 +185,11 @@ class preprocessor(object):
             if not os.path.exists(directory):
                 os.makedirs(directory)
             np.save(directory + '/features', np.array(X_folder))
-            np.save(directory + '/labels', self.one_hot_encode(np.array(labels_folder, dtype=np.int)))
+            if classificationtask == "multi":
+                np.save(directory + '/labels', self.plus_one_hot_encode(labels_folder))
+            else:
+                np.save(directory + '/labels', self.one_hot_encode(np.array(labels_folder, dtype=np.int)))
+
             X_folder, labels_folder = [], []
 
     def load_extracted_fts_lbs(self, train_dirs, test_fold='', val_fold='', load_path=''):

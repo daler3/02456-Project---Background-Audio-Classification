@@ -63,45 +63,6 @@ def piczac_cross_validation(epochs, load_path):
         #utils.plot_confusion_matrix(confusion_matrix, classes)
     print("Average performance after cross-validation: %.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
 
-
-def scikit_cross_validation(epochs, load_path):
-    train_dirs = []
-
-    logging.basicConfig(filename='cv.log', filemode='w', level=logging.DEBUG)
-
-    n_folders = 10
-    for i in range(1, n_folders + 1):
-        train_dirs.append('fold{0}'.format(i))
-
-    pp = preprocessor()
-    pp.load_extracted_fts_lbs(train_dirs=train_dirs,
-                 load_path=load_path)  # test_fold=test_dir,
-    logging.info("Data prep completed")
-
-    CV = model_selection.KFold(10, shuffle=True)
-
-    k = 0
-    es = EarlyStopping(patience=5, verbose=1)
-    for train_index, test_index in CV.split(pp.X):
-        print('Computing CV fold: {0}/{1}..'.format(k + 1, 10))
-        tb = TensorBoard(log_dir='./TensorBoard/' + 'run{0}'.format(k + 1))
-        # extract training and test set for current CV fold
-        X_train, y_train = pp.X[train_index, :], pp.y[train_index]
-        X_test, y_test = pp.X[test_index, :], pp.y[test_index]
-
-        model = piczak_CNN(input_dim=X_train[0].shape, output_dim=y_train.shape[1])
-        logging.info("Model built")
-
-        model.fit(X_train, y_train, validation_split=0.1, epochs=epochs,
-                  batch_size=1000, verbose=2, callbacks=[tb])
-        logging.info("Model trained")
-
-        scores = model.evaluate(X_test, y_test, verbose=2)
-        # logging.info("loss: {0}, test-acc: {1}".format(scores[0], scores[1]))
-        print("loss: {0}, test-acc: {1}".format(scores[0], scores[1]))
-        k = k + 1
-
-
 if __name__ == '__main__':
     # if using long segments, use 150 epochs. if using short, use 300
     # change tensorboard folder and model output file
