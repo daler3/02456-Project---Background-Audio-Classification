@@ -1,12 +1,8 @@
 from preprocessor import preprocessor
 from keras_models import piczak_CNN
 from keras.callbacks import TensorBoard, EarlyStopping
-from sklearn import metrics, model_selection
-from keras.models import load_model
 import numpy as np
-import pandas as pd
-import logging
-from keras import optimizers
+from keras import backend as K
 import utils
 
 def piczac_cross_validation(epochs, load_path):
@@ -57,17 +53,20 @@ def piczac_cross_validation(epochs, load_path):
         #    pd.DataFrame({"Predictions": preds, "Actual": np.argmax(pp.test_y, axis=1)}).to_csv(fname, index=False,
         #                                                                                      header=True)
         cvscores.append(scores[1] * 100)
+        K.clear_session()
         #preds = model.predict_classes(pp.test_x, verbose=0)
         #write_preds(preds, output_predictions_file)
         #confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
         #utils.plot_confusion_matrix(confusion_matrix, classes)
+
     print("Average performance after cross-validation: %.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
 
 if __name__ == '__main__':
     # if using long segments, use 150 epochs. if using short, use 300
     # change tensorboard folder and model output file
+
+    piczac_cross_validation(epochs=2, load_path="../UrbanSound8K/audio/extracted_short_60")
     #piczac_cross_validation(epochs=300, load_path='extracted_short_60')
-    #scikit_cross_validation(epochs=150, load_path='extracted_long_60')
     #model_filename = 'models/long60/long60_150_(9, 10).h5'
     #load_path = 'data/extracted_long_60'
     #plot_confusion_matrix(model_filename, load_path)
