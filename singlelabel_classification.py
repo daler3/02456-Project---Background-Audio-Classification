@@ -1,12 +1,8 @@
 from preprocessor import preprocessor
 from keras_models import piczak_CNN
 from keras.callbacks import TensorBoard, EarlyStopping
-from sklearn import metrics, model_selection
-from keras.models import load_model
 import numpy as np
-import pandas as pd
-import logging
-from keras import optimizers
+from keras import backend as K
 import utils
 classes = classes = ['air_conditioner', 'car_horn', 'children_playing', 'dog_bark', 'drilling', 'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music']
 def piczac_cross_validation(epochs, load_path):
@@ -57,56 +53,20 @@ def piczac_cross_validation(epochs, load_path):
         #    pd.DataFrame({"Predictions": preds, "Actual": np.argmax(pp.test_y, axis=1)}).to_csv(fname, index=False,
         #                                                                                      header=True)
         cvscores.append(scores[1] * 100)
+        K.clear_session()
         #preds = model.predict_classes(pp.test_x, verbose=0)
         #write_preds(preds, output_predictions_file)
         #confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
         #utils.plot_confusion_matrix(confusion_matrix, classes)
+
     print("Average performance after cross-validation: %.2f%% (+/- %.2f%%)" % (np.mean(cvscores), np.std(cvscores)))
-
-
-def scikit_cross_validation(epochs, load_path):
-    train_dirs = []
-
-    logging.basicConfig(filename='cv.log', filemode='w', level=logging.DEBUG)
-
-    n_folders = 10
-    for i in range(1, n_folders + 1):
-        train_dirs.append('fold{0}'.format(i))
-
-    pp = preprocessor()
-    pp.load_extracted_fts_lbs(train_dirs=train_dirs,
-                 load_path=load_path)  # test_fold=test_dir,
-    logging.info("Data prep completed")
-
-    CV = model_selection.KFold(10, shuffle=True)
-
-    k = 0
-    es = EarlyStopping(patience=5, verbose=1)
-    for train_index, test_index in CV.split(pp.X):
-        print('Computing CV fold: {0}/{1}..'.format(k + 1, 10))
-        tb = TensorBoard(log_dir='./TensorBoard/' + 'run{0}'.format(k + 1))
-        # extract training and test set for current CV fold
-        X_train, y_train = pp.X[train_index, :], pp.y[train_index]
-        X_test, y_test = pp.X[test_index, :], pp.y[test_index]
-
-        model = piczak_CNN(input_dim=X_train[0].shape, output_dim=y_train.shape[1])
-        logging.info("Model built")
-
-        model.fit(X_train, y_train, validation_split=0.1, epochs=epochs,
-                  batch_size=1000, verbose=2, callbacks=[tb])
-        logging.info("Model trained")
-
-        scores = model.evaluate(X_test, y_test, verbose=2)
-        # logging.info("loss: {0}, test-acc: {1}".format(scores[0], scores[1]))
-        print("loss: {0}, test-acc: {1}".format(scores[0], scores[1]))
-        k = k + 1
-
 
 if __name__ == '__main__':
     # if using long segments, use 150 epochs. if using short, use 300
     # change tensorboard folder and model output file
-    piczac_cross_validation(epochs=300, load_path='E:\\Deep Learning Datasets\\UrbanSound8K\\extracted_short_60')
-    #scikit_cross_validation(epochs=150, load_path='extracted_long_60')
+
+    piczac_cross_validation(epochs=300, load_path="../UrbanSound8K/audio/extracted_short_60")
+    #piczac_cross_validation(epochs=300, load_path='extracted_short_60')
     #model_filename = 'models/long60/long60_150_(9, 10).h5'
     #load_path = 'data/extracted_long_60'
     #plot_confusion_matrix(model_filename, load_path)
