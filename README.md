@@ -7,6 +7,7 @@ The implementation part has been done with Keras using a Tensorflow backend. The
 
 
 ## Organization of the repository: 
+##### Main files: 
 - singlelabel_classification.py: main file to run for performing single label classification 
 - multilabel_classification.py: main file to run for performing multilabel classification
 - keras_models.py: it contains the models implemented and used during the project
@@ -14,8 +15,14 @@ The implementation part has been done with Keras using a Tensorflow backend. The
 
 - extract_features.py: script used for extracting the features from the audio clips
 
+##### Supplementary files: 
 - boxplot.py:
 - load_plot_cm.py:
 - plot_specgrams.py:
 
 - draw_convnet.py: script used for drawing the cnn architecture 
+
+
+## Python Notebook:
+The repository contains also a Python notebook that can be seen at the following link: xxx
+The notebook explains the pipeline according to which this project was done and the obtained results, along with some code snippets. 
