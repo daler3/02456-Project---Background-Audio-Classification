@@ -8,7 +8,7 @@ import pandas as pd
 import logging
 from keras import optimizers
 import utils
-
+classes = classes = ['air_conditioner', 'car_horn', 'children_playing', 'dog_bark', 'drilling', 'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music']
 def piczac_cross_validation(epochs, load_path):
     train_dirs = []
 
