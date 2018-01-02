@@ -4,3 +4,18 @@ This project treats the topic of sound event classification using Convolutional 
 The dataset used to evaluate the architecture is UrbanSound8K. This dataset has also been used to create two new synthetic datasets (by overlaying two sound events) to test the performances of the multilabel classifier.
 
 The implementation part has been done with Keras using a Tensorflow backend. The obtained architecture performs similar to the original one with respect to the single-labelled sounds. In the multilabel case, the classifier is able to classify both sounds in 14% of the cases, while one of the two sounds is recognized in most of the cases. We also show that pretraining the multilabel classifier with single-labelled sounds from the original dataset (and successively training it with overlaying sounds) helps in achieving a better accuracy, especially when the sound segment to be classified is composed by a single event.  
+
+
+## Organization of the repository: 
+- singlelabel_classification.py: main file to run for performing single label classification 
+- multilabel_classification.py: main file to run for performing multilabel classification
+- keras_models.py: it contains the models implemented and used during the project
+- preprocessor.py: it contains the methods for preprocessing the sound clips
+
+- extract_features.py: script used for extracting the features from the audio clips
+
+- boxplot.py:
+- load_plot_cm.py:
+- plot_specgrams.py:
+
+- draw_convnet.py: script used for drawing the cnn architecture 
