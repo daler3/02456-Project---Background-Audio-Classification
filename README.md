@@ -1,4 +1,4 @@
-# 02456-Project: URBAN SOUND CLASSIFICATION USING CONVOLUTIONAL NEURAL NETWORKS
+# 02456-Project: Urban Sound Classification using Convolutional Neural Networks
 This project treats the topic of sound event classification using Convolutional Neural Networks, analyzing and trying to improve the architecture proposed by K. J. Piczak. The network consists of 2 convolutional layers with max-pooling followed by two fully connected layers, and it is trained using log powered mel-spectrograms and their delta features. Moreover, the architecture is modified to perform multilabel sound classification, such as the classification of two different simultaneous sound events.
 
 The dataset used to evaluate the architecture is UrbanSound8K. This dataset has also been used to create two new synthetic datasets (by overlaying two sound events) to test the performances of the multilabel classifier.
