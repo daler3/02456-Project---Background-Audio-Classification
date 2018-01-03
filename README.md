@@ -16,11 +16,11 @@ The implementation part has been done with Keras using a Tensorflow backend. The
 - extract_features.py: script used for extracting the features from the audio clips
 
 ##### Supplementary files: 
-- boxplot.py: file for creating a boxplot from an excelfile
+- boxplot.py: file for creating a boxplot from an excel-file
 - load_plot_cm.py: file for loading and plotting a confusion matrix
 - draw_convnet.py: script used for drawing the cnn architecture 
 
 
 ## Python Notebook:
-The repository contains also a Python notebook that can be seen [here](https://github.com/lccambiaghi/02456-Project---Background-Audio-Classification/blob/master/Notebook.ipynb)
+The repository contains also a Python notebook that can be seen [here](http://nbviewer.jupyter.org/github/lccambiaghi/02456-Project---Background-Audio-Classification/blob/master/Notebook.ipynb)
 The notebook explains the major steps needed in order to reproduce the obtained results, along with some code snippets. 
