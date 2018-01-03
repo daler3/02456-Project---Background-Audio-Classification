@@ -21,7 +21,7 @@ pp.load_extracted_fts_lbs(load_path=load_path, train_dirs=train_dirs, test_fold=
 train_dirs.append(val_fold)
 train_dirs.append(test_fold)
 print("Data prep completed")
-model = load_model('models/long60_150_(9, 10).h5')    
+model = load_model('models/long60_150_(9, 10).h5')
 preds = model.predict_classes(pp.test_x, verbose=0)
 confusion_matrix = metrics.confusion_matrix(np.argmax(pp.test_y, axis=1), preds)
 utils.save_confusion_matrix(confusion_matrix, classes, title='long60_150_(9, 10)')
