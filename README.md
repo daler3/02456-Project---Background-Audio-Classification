@@ -21,6 +21,9 @@ The implementation part has been done with Keras using a Tensorflow backend. The
 - load_plot_cm.py: file for loading and plotting a confusion matrix
 - draw_convnet.py: script used for drawing the cnn architecture 
 
+##### Overlaying dataset creation:
+The folder called "Overlaying_datasets_creation_scripts" contains the scripts necessary to create two datasets containing overlaying sound segments, starting from UrbanSound8K. More explanation of this can be found in the Python notebook referenced below. 
+
 
 ## Python Notebook:
 The repository contains also a Python notebook that can be seen [here](http://nbviewer.jupyter.org/github/lccambiaghi/02456-Project---Background-Audio-Classification/blob/master/Notebook.ipynb)
