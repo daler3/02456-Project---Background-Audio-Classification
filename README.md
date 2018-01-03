@@ -26,5 +26,5 @@ The folder called "Overlaying_datasets_creation_scripts" contains the scripts ne
 
 
 ## Python Notebook:
-The repository contains also a Python notebook that can be seen [here](https://github.com/lccambiaghi/02456-Project---Background-Audio-Classification/blob/master/Notebook.ipynb)
+The repository contains also a Python notebook that can be seen [here](http://nbviewer.jupyter.org/github/lccambiaghi/02456-Project---Background-Audio-Classification/blob/master/Notebook.ipynb?flush_cache=true)
 The notebook explains the major steps needed in order to reproduce the obtained results, along with some code snippets. 
