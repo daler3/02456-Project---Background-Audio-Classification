@@ -95,7 +95,7 @@ def piczac_cross_validation(epochs, load_path):
 		train_dirs.append('folder{0}_overlap'.format(i))
 
 	print(train_dirs)
-	for fold in [(9, 10), (2, 5), (6, 7)]:
+	for fold in ((10, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 7), (7, 8), (8, 9), (9, 10)):
 		val_fold = 'folder{0}_overlap'.format(fold[0])
 		test_fold = 'folder{0}_overlap'.format(fold[1])
 		#val_fold = 'fold{0}'.format(fold[0])

@@ -17,7 +17,7 @@ def plot_confusion_matrix(cm, classes,
     else:
         print('Confusion matrix, without normalization')
 
-    print(cm)
+    # print(cm)
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -36,7 +36,7 @@ def plot_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.show()
+    # plt.draw()   
 
 
 
@@ -55,7 +55,7 @@ def save_confusion_matrix(cm, classes,
     else:
         print('Confusion matrix, without normalization')
 
-    print(cm)
+    # print(cm)
 
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
     plt.title(title)
@@ -74,4 +74,4 @@ def save_confusion_matrix(cm, classes,
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.savefig("confusion_matrix/{0}.png".format(title), dpi=300)
+    plt.savefig("{0}.png".format(title), dpi=300)
